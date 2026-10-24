@@ -19,11 +19,11 @@
       "usd": 3.8572
     },
     "claude-sonnet-5-5": {
-      "calls": 53,
-      "input_tokens": 87840,
-      "output_tokens": 8175,
-      "usd": 0.2574
+      "calls": 54,
+      "input_tokens": 89951,
+      "output_tokens": 8756,
+      "usd": 0.2675
     }
   },
-  "usd": 6.4946
+  "usd": 6.5047
 }
