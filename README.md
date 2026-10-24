@@ -2,6 +2,10 @@
 
 Compile and prove least-privilege policies for MCP-connected AI agents.
 
+> **First version.** The specs, plan, roles and scope below are a starting point, not a final
+> decision. The team is free to review and change them to make the project as strong as possible;
+> keep `docs/GUIA-EQUIPO.md` and `odd/tasks/agentchaincut.md` in sync when you do.
+
 **What exists and runs today:** the artifact contracts (JSON Schemas + validated fixtures),
 contract helpers in `acc/contracts.py`, the package skeleton and a stub `acc` CLI.
 The pipeline itself is not implemented yet.

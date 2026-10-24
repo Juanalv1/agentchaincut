@@ -1,5 +1,9 @@
 # AgentChainCut — Feature Document
 
+> **First version (v1).** Everything here (scope, contracts, algorithms, evaluation, demo, task
+> split) is an initial proposal. The team owns it and is free to revise any part to maximize the
+> result; record meaningful changes in Progress so everyone stays aligned.
+
 > Compile and prove least-privilege policies for MCP-connected AI agents.
 > Platanus Hack 26 Caracas · AI Security track · Status: **design, not started**
 

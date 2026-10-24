@@ -1,5 +1,10 @@
 # AgentChainCut — Guía para el equipo
 
+> **Esto es una primera versión.** Las specs, el plan, los roles y el alcance son un punto de
+> partida, no una decisión cerrada. El equipo es libre de revisarlos, cuestionarlos y cambiarlos
+> como considere para sacar el mejor proyecto posible. Si cambian algo importante, actualicen esta
+> guía y `odd/tasks/agentchaincut.md` para que todos trabajen sobre lo mismo.
+
 > Si no sabes nada del proyecto, lee esto de arriba a abajo (unos 10 minutos).
 > Versión con diagramas editables: [documento compartido](https://claude.ai/artifact/9qFrZRR6oTcA9xaTZbfg41).
 > Detalle técnico completo (en inglés): [`odd/tasks/agentchaincut.md`](../odd/tasks/agentchaincut.md).
