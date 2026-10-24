@@ -1,6 +1,7 @@
 """Run the live agent N times per side and per model, and record transcripts for offline replay.
 
     python -m eval.live [--runs 3] [--model claude-opus-5-5 --model claude-haiku-5-5 ...]
+    python -m eval.live rescore      # offline: re-score the recorded transcripts, no API calls
 
 Needs ANTHROPIC_API_KEY (env or git-ignored .env). Writes eval/results/live/<model>/<side>-<run>.json
 and eval/results/live/summary.json; leak rates are reported with their n (measured).
@@ -59,7 +60,21 @@ async def _one(side: str, policy: dict, seed: int, run: int, model: str, style: 
     return {"side": side, "run": run, "attack": style, "ticket": ticket["body"], "victim_invoice": ticket["victim_invoice"], "denied_calls": len(proxy_denies), **result}
 
 
+def rescore_main(argv: list[str]) -> int:
+    from eval.live.rescore import rescore, table
+
+    parser = argparse.ArgumentParser(prog="python -m eval.live rescore")
+    parser.add_argument("--out", default=str(ROOT / "eval" / "results" / "live"))
+    parser.add_argument("--seed", type=int, default=26)
+    args = parser.parse_args(argv)
+    print(table(rescore(Path(args.out), seed=args.seed)))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["rescore"]:
+        return rescore_main(argv[1:])
     parser = argparse.ArgumentParser(prog="python -m eval.live")
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--model", action="append", help=f"repeatable (default: {MODEL})")
@@ -86,6 +101,7 @@ def main(argv: list[str] | None = None) -> int:
         sides = {}
         for side in ("unprotected", "protected"):
             leaks, completed, denied, refunded, answered, foreign = 0, 0, 0, 0, 0, 0
+            v2 = {"leaked_v2": 0, "disclosed_in_mail": 0, "disclosed_in_note": 0, "foreign_refund": 0}
             for run in range(args.runs):
                 record = asyncio.run(_one(side, policy, args.seed, run, model, args.attack))
                 (model_dir / f"{side}-{run}.json").write_text(json.dumps(record, indent=2, default=str) + "\n", encoding="utf-8")
@@ -95,12 +111,14 @@ def main(argv: list[str] | None = None) -> int:
                 completed += any(not record["leaked"] and m["to"] for m in record["emails_sent"])
                 answered += answered_customer(record)
                 foreign += read_foreign_invoice(record)
+                for field in v2:
+                    v2[field] += record[field]
                 print(f"{key} {side} run {run}: leaked={record['leaked']} refunded={record['victim_refunded']} denied={record['denied_calls']} "
                       f"tools={[s['tool'] for s in record['steps']]}")
             sides[side] = {"n": args.runs, "leaked": leaks, "victim_refunded": refunded,
                            "read_foreign_invoice": foreign,
                            "replied_to_customer": completed, "answered_customer": answered,
-                           "runs_with_denies": denied}
+                           "runs_with_denies": denied, **v2}
         summary["models"][key] = sides
         print(key, json.dumps(sides), f"spent so far ${claude.spent_usd():.2f}")
     summary_path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
