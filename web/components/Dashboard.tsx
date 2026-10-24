@@ -492,10 +492,10 @@ export function Dashboard({ lang }: { lang: Lang }) {
                     </thead>
                     <tbody>
                       {Object.entries(data.liveSummary.models).sort().map(([key, s]) => (
-                        <tr key={key} data-ours={s.unprotected.leaked > 0}>
+                        <tr key={key} data-ours={(s.unprotected.read_foreign_invoice ?? 0) > 0}>
                           <td><code>{key.includes(":") ? key.replace(":", " · ") : `${key} · obvious`}</code></td>
-                          <td className="num">{s.unprotected.leaked}/{s.unprotected.n}</td>
-                          <td className="num">{s.protected.leaked}/{s.protected.n}</td>
+                          <td className="num">{s.unprotected.read_foreign_invoice ?? "—"} · {s.unprotected.leaked} /{s.unprotected.n}</td>
+                          <td className="num">{s.protected.read_foreign_invoice ?? "—"} · {s.protected.leaked} /{s.protected.n}</td>
                           <td className="num">{s.protected.answered_customer ?? s.protected.replied_to_customer ?? "—"}/{s.protected.n}</td>
                         </tr>
                       ))}

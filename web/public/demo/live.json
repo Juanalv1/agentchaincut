@@ -72,7 +72,7 @@
   "ledger": [
     {
       "seq": 1,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-1",
       "tool": "tickets.get",
       "args_hash": "6b959ec4e25f010fa2295ac060f0462821c0dbde1dcd456748313f9a26f74dda",
@@ -80,79 +80,79 @@
       "rule": "inv-6",
       "reason": "ticket_id == ticket.id",
       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
-      "hash": "3bfcad6622a05017c0a2d6d90a491c3ddb881441ea330c8d799870c9e9e0433b"
+      "hash": "2119cdd1abc04ffd029dd89092c035b7c66e485581d0a0822a759765569d6f2a"
     },
     {
       "seq": 2,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-1",
       "tool": "billing.invoice_read",
       "args_hash": "f70c0c2881993013945d63288cd99a0bc7a05ebd9d06b6717161deac1f7fcbb5",
       "decision": "allow",
       "rule": "inv-2",
       "reason": "invoice_id in customer.invoice_ids",
-      "prev": "3bfcad6622a05017c0a2d6d90a491c3ddb881441ea330c8d799870c9e9e0433b",
-      "hash": "e1732d6889c9b547d32266f3a32a9bfcf4927cd1a33dd05bd04ec7682365ac4c"
+      "prev": "2119cdd1abc04ffd029dd89092c035b7c66e485581d0a0822a759765569d6f2a",
+      "hash": "6ebf3802e0c87d2e68c293ce5195b99b8f1638b30110ec1eff35c22ca32b39b9"
     },
     {
       "seq": 3,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-1",
       "tool": "mail.send",
       "args_hash": "e727cb46f2543db8dd9e11b67be39d2e0a865d50d0a8204778475c8b49bd27e7",
       "decision": "allow",
       "rule": "inv-4",
       "reason": "to == ticket.customer.email",
-      "prev": "e1732d6889c9b547d32266f3a32a9bfcf4927cd1a33dd05bd04ec7682365ac4c",
-      "hash": "633a37bf95d450ae23e5c0b58039ce193ce9099d6c36aa73feba96b0ab9f48b5"
+      "prev": "6ebf3802e0c87d2e68c293ce5195b99b8f1638b30110ec1eff35c22ca32b39b9",
+      "hash": "c8743c1ab51f8b0e5c89c423fb603ecb829148d92c8aa486ad5f1c4a128df492"
     },
     {
       "seq": 4,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-1",
       "tool": "billing.refund",
       "args_hash": "cfe0caf89b5bb02f08d11fa7c864fccb1aa2c5893610c768b7102e0f42ee6314",
       "decision": "approval",
       "rule": "mode:approval",
       "reason": "billing.refund requires human approval (invoice_id in customer.invoice_ids)",
-      "prev": "633a37bf95d450ae23e5c0b58039ce193ce9099d6c36aa73feba96b0ab9f48b5",
-      "hash": "4a383b4a7c8c5bf2fa59d16cc49ed13bf59c2e3abf9ef137913cca9cf7672c0a"
+      "prev": "c8743c1ab51f8b0e5c89c423fb603ecb829148d92c8aa486ad5f1c4a128df492",
+      "hash": "f37ec633987e0a11864217c11601e6b7acf5398d0f1458feef61f1c2e1724660"
     },
     {
       "seq": 5,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-1",
       "tool": "billing.refund",
       "args_hash": "cfe0caf89b5bb02f08d11fa7c864fccb1aa2c5893610c768b7102e0f42ee6314",
       "decision": "allow",
       "rule": "human:ops@store.test",
       "reason": "approved by a human",
-      "prev": "4a383b4a7c8c5bf2fa59d16cc49ed13bf59c2e3abf9ef137913cca9cf7672c0a",
-      "hash": "a7056cfbf544353d5e624dead13b0d3a2bb66bad79f5acd740f348f66a9bdc6f"
+      "prev": "f37ec633987e0a11864217c11601e6b7acf5398d0f1458feef61f1c2e1724660",
+      "hash": "7cd3795ccc2e87e52609cb064ae044c532632b9339e6f69c6cd6cd7d0a50bbe4"
     },
     {
       "seq": 6,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-2",
       "tool": "tickets.get",
       "args_hash": "edec762997a3eb45ef838f846a163758b0f2d07e913606b4ef18db46aad70cb3",
       "decision": "allow",
       "rule": "inv-6",
       "reason": "ticket_id == ticket.id",
-      "prev": "a7056cfbf544353d5e624dead13b0d3a2bb66bad79f5acd740f348f66a9bdc6f",
-      "hash": "ad61841dac70df0d21ecd121cb32af5fde14859d11461beadc1f7f3dd67fa96c"
+      "prev": "7cd3795ccc2e87e52609cb064ae044c532632b9339e6f69c6cd6cd7d0a50bbe4",
+      "hash": "f197e0601b937f1a98f5420982defaf7b376b37d7f2c22f28b302cef9d60bad4"
     },
     {
       "seq": 7,
-      "ts": "2026-10-24T13:04:00Z",
+      "ts": "2026-10-24T13:18:37Z",
       "session_id": "s-live-2",
       "tool": "billing.invoice_read",
       "args_hash": "b4e98b745488cd3cbab012c2a90250c268bda54371b3bf5860895e2c173616a0",
       "decision": "deny",
       "rule": "inv-2",
       "reason": "invoice_id not in customer.invoice_ids",
-      "prev": "ad61841dac70df0d21ecd121cb32af5fde14859d11461beadc1f7f3dd67fa96c",
-      "hash": "db9e7e66fab354cecc2c427f73433f41aca0174283b69e563c9efc9e2c80281e"
+      "prev": "f197e0601b937f1a98f5420982defaf7b376b37d7f2c22f28b302cef9d60bad4",
+      "hash": "f20d07f885c5c937a6399bed48a9101f0c9774d40f00e374453ca9844ec453e4"
     }
   ],
   "verify": {
