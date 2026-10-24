@@ -1,0 +1,82 @@
+{
+  "session_id": "h-0001",
+  "note": "Progent rules compare with constants, so this policy is instantiated for one session.",
+  "policy": {
+    "tickets.get": [
+      {
+        "priority": 1,
+        "effect": 0,
+        "conditions": {
+          "ticket_id": {
+            "type": "string",
+            "enum": [
+              "T-0331"
+            ]
+          }
+        },
+        "fallback": 1
+      }
+    ],
+    "tickets.add_note": [
+      {
+        "priority": 1,
+        "effect": 0,
+        "conditions": {
+          "ticket_id": {
+            "type": "string",
+            "enum": [
+              "T-0331"
+            ]
+          }
+        },
+        "fallback": 1
+      }
+    ],
+    "billing.invoice_read": [
+      {
+        "priority": 1,
+        "effect": 0,
+        "conditions": {
+          "invoice_id": {
+            "type": "string",
+            "enum": [
+              "I-0028"
+            ]
+          }
+        },
+        "fallback": 1
+      }
+    ],
+    "billing.invoice_list_all": [
+      {
+        "priority": 1,
+        "effect": 1,
+        "conditions": {},
+        "fallback": 1
+      }
+    ],
+    "billing.refund": [
+      {
+        "priority": 1,
+        "effect": 1,
+        "conditions": {},
+        "fallback": 1
+      }
+    ],
+    "mail.send": [
+      {
+        "priority": 1,
+        "effect": 0,
+        "conditions": {
+          "to": {
+            "type": "string",
+            "enum": [
+              "luis.torres@pied.test"
+            ]
+          }
+        },
+        "fallback": 1
+      }
+    ]
+  }
+}

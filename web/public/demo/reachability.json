@@ -1,0 +1,84 @@
+{
+  "before": {
+    "result": {
+      "path": [
+        "tickets.get",
+        "billing.invoice_read",
+        "mail.send"
+      ],
+      "legs": [
+        "U",
+        "S",
+        "X"
+      ],
+      "allowed": true
+    },
+    "steps": [
+      {
+        "tool": "tickets.get",
+        "decision": "allow",
+        "rule": null,
+        "reason": "broad backend credential"
+      },
+      {
+        "tool": "billing.invoice_read",
+        "decision": "allow",
+        "rule": null,
+        "reason": "broad backend credential"
+      },
+      {
+        "tool": "mail.send",
+        "decision": "allow",
+        "rule": null,
+        "reason": "broad backend credential"
+      }
+    ]
+  },
+  "after": {
+    "result": {
+      "path": [
+        "tickets.get",
+        "billing.invoice_read",
+        "mail.send"
+      ],
+      "legs": [
+        "U",
+        "S",
+        "X"
+      ],
+      "allowed": false
+    },
+    "steps": [
+      {
+        "tool": "tickets.get",
+        "decision": "allow",
+        "rule": "inv-5",
+        "reason": "ticket_id == ticket.id"
+      },
+      {
+        "tool": "billing.invoice_read",
+        "decision": "deny",
+        "rule": "inv-1",
+        "reason": "invoice_id not in customer.invoice_ids"
+      },
+      {
+        "tool": "mail.send",
+        "decision": "skipped",
+        "rule": null,
+        "reason": "chain already cut"
+      }
+    ]
+  },
+  "graph_path": {
+    "path": [
+      "tickets.get",
+      "billing.invoice_read",
+      "mail.send"
+    ],
+    "legs": [
+      "U",
+      "S",
+      "X"
+    ]
+  }
+}

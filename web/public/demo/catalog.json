@@ -1,0 +1,168 @@
+[
+  {
+    "tool": "tickets.get",
+    "server": "tickets",
+    "description": "Read a support ticket, including the customer's free-text message.",
+    "args": [
+      {
+        "name": "ticket_id",
+        "type": "string",
+        "role": "object_id"
+      }
+    ],
+    "legs": {
+      "U": true,
+      "S": false,
+      "X": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "openWorldHint": true
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=true; openWorldHint=true, so its output carries untrusted outside text"
+  },
+  {
+    "tool": "tickets.add_note",
+    "server": "tickets",
+    "description": "Append a note to a ticket; notes are visible to the customer.",
+    "args": [
+      {
+        "name": "ticket_id",
+        "type": "string",
+        "role": "object_id"
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "role": "content"
+      },
+      {
+        "name": "author",
+        "type": "string",
+        "role": "other"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": false,
+      "X": true
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=false; it changes state outside the agent"
+  },
+  {
+    "tool": "billing.invoice_read",
+    "server": "billing",
+    "description": "Read one invoice by id.",
+    "args": [
+      {
+        "name": "invoice_id",
+        "type": "string",
+        "role": "object_id"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": true,
+      "X": false
+    },
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=true; name refers to sensitive records"
+  },
+  {
+    "tool": "billing.invoice_list_all",
+    "server": "billing",
+    "description": "List invoices across all customers.",
+    "args": [
+      {
+        "name": "status",
+        "type": "string",
+        "role": "filter"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": true,
+      "X": false
+    },
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=true; name refers to sensitive records"
+  },
+  {
+    "tool": "billing.refund",
+    "server": "billing",
+    "description": "Refund an invoice, fully or partially.",
+    "args": [
+      {
+        "name": "invoice_id",
+        "type": "string",
+        "role": "object_id"
+      },
+      {
+        "name": "amount",
+        "type": "number",
+        "role": "amount"
+      },
+      {
+        "name": "currency",
+        "type": "string",
+        "role": "other"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": false,
+      "X": true
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=false; destructiveHint=true; it changes state outside the agent"
+  },
+  {
+    "tool": "mail.send",
+    "server": "mail",
+    "description": "Send an email to any address.",
+    "args": [
+      {
+        "name": "to",
+        "type": "string",
+        "role": "destination"
+      },
+      {
+        "name": "subject",
+        "type": "string",
+        "role": "content"
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "role": "content"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": false,
+      "X": true
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "openWorldHint": true
+    },
+    "source": "manual",
+    "rationale": "Manual override: outbound email to an arbitrary destination is the primary exfiltration sink."
+  }
+]

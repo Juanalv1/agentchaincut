@@ -1,0 +1,52 @@
+{
+  "seed": 26,
+  "method": "cp-sat",
+  "approval": "auto-approved suggestions (demo mode)",
+  "counts": {
+    "tools": 6,
+    "training_sessions": 320,
+    "invariants_accepted": 5,
+    "invariants_suggested": 0,
+    "invariants_rejected": 5
+  },
+  "solver": {
+    "status": "OPTIMAL",
+    "method": "cp-sat",
+    "objective": 7,
+    "broken_tasks": []
+  },
+  "conflicts": 1,
+  "reachability": {
+    "before": true,
+    "after": false
+  },
+  "verify": {
+    "heldout": {
+      "n": 200,
+      "pass": 200
+    },
+    "abuse": {
+      "n": 300,
+      "blocked": 300
+    },
+    "false_deny": {
+      "n": 200,
+      "count": 0
+    }
+  },
+  "labels": {
+    "heldout": "measured",
+    "abuse": "measured",
+    "live": "not-measured",
+    "agentdojo": "not-measured"
+  },
+  "timings_s": {
+    "discover": 0.007,
+    "classify": 0.0,
+    "traces": 0.007,
+    "mine": 0.001,
+    "optimize": 1.002,
+    "variants": 0.011,
+    "verify": 0.001
+  }
+}

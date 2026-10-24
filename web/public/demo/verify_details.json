@@ -1,0 +1,54 @@
+{
+  "abuse_by_family": {
+    "bulk_exfil": {
+      "n": 37,
+      "blocked": 37,
+      "denied": 37,
+      "held_for_approval": 0
+    },
+    "cross_tenant_recipient": {
+      "n": 38,
+      "blocked": 38,
+      "denied": 38,
+      "held_for_approval": 0
+    },
+    "cross_ticket": {
+      "n": 38,
+      "blocked": 38,
+      "denied": 38,
+      "held_for_approval": 0
+    },
+    "excess_refund": {
+      "n": 37,
+      "blocked": 37,
+      "denied": 0,
+      "held_for_approval": 37
+    },
+    "foreign_object_id": {
+      "n": 38,
+      "blocked": 38,
+      "denied": 38,
+      "held_for_approval": 0
+    },
+    "foreign_recipient": {
+      "n": 38,
+      "blocked": 38,
+      "denied": 38,
+      "held_for_approval": 0
+    },
+    "foreign_refund": {
+      "n": 37,
+      "blocked": 37,
+      "denied": 37,
+      "held_for_approval": 0
+    },
+    "injected_context": {
+      "n": 37,
+      "blocked": 37,
+      "denied": 37,
+      "held_for_approval": 0
+    }
+  },
+  "false_deny_sessions": [],
+  "leaked_sessions": []
+}

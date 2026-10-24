@@ -1,0 +1,30 @@
+version: 1
+kind: agent-permissions
+agent: support-agent
+default: deny
+tools:
+- name: tickets.get
+  decision: allow
+  when:
+  - arg: ticket_id
+    equals_context: ticket.id
+- name: tickets.add_note
+  decision: allow
+  when:
+  - arg: ticket_id
+    equals_context: ticket.id
+- name: billing.invoice_read
+  decision: allow
+  when:
+  - arg: invoice_id
+    in_context: customer.invoice_ids
+- name: billing.refund
+  decision: ask
+  when:
+  - arg: invoice_id
+    in_context: customer.invoice_ids
+- name: mail.send
+  decision: allow
+  when:
+  - arg: to
+    equals_context: ticket.customer.email
