@@ -78,6 +78,16 @@ export type BenchRow = {
   policy_variance?: { runs: number; sessions: number; sessions_with_differing_policies: number };
 };
 export type Bench = { heldout_full: BenchRow[]; llm_sample: BenchRow[] };
+export type AgentDojoSuite = {
+  suite: string;
+  utility_n: number;
+  utility_lenient: number;
+  utility_strict: number;
+  attacks_n: number;
+  attacks_succeeded: number;
+  attacks_held: number;
+};
+export type AgentDojo = { benchmark: string; method: string; suites: AgentDojoSuite[]; total: Omit<AgentDojoSuite, "suite"> };
 export type Snapshot = {
   catalog: Tool[];
   invariants: Invariant[];
@@ -85,6 +95,7 @@ export type Snapshot = {
   verify: Verify;
   details: VerifyDetails;
   bench: Bench;
+  agentdojo: AgentDojo;
   live: { attack: Attack; ledger: LedgerEntry[] };
   hook: string;
   assay: string;

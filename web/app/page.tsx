@@ -413,6 +413,29 @@ export default function Dashboard() {
             <ResultsTable rows={bench.heldout_full} />
             <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>Stratified sample with the LLM-written policy</h3>
             <ResultsTable rows={bench.llm_sample} />
+            <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>AgentDojo · policy level, within-suite k-fold, no LLM</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Suite</th><th>Attacks allowed ↓</th><th>Held for a human</th><th>Utility (approval ok) ↑</th><th>Utility (no approval) ↑</th></tr>
+                </thead>
+                <tbody>
+                  {[...data.agentdojo.suites, { suite: "all", ...data.agentdojo.total }].map((s) => (
+                    <tr key={s.suite} data-ours={s.suite === "all"}>
+                      <td>{s.suite}</td>
+                      <td className="num">{pct(s.attacks_succeeded, s.attacks_n)} ({s.attacks_succeeded}/{s.attacks_n})</td>
+                      <td className="num">{pct(s.attacks_held, s.attacks_n)}</td>
+                      <td className="num">{pct(s.utility_lenient, s.utility_n)} ({s.utility_lenient}/{s.utility_n})</td>
+                      <td className="num">{pct(s.utility_strict, s.utility_n)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="note" style={{ marginTop: "var(--space-sm)" }}>
+              Without trusted session context (AgentDojo recipients come from files and channels) the policy falls back
+              to human approval. Published end-to-end references: no defense 39.9% / 79.4%, Progent-LLM 1.0% / 76.3%.
+            </p>
             <p className="note" style={{ marginTop: "var(--space-md)" }}>
               Declared limits: free-form SQL arguments, server-side bugs, residual channels above, and a synthetic world
               modeled on real API schemas.

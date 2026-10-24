@@ -18,6 +18,7 @@ const files = {
   "artifacts/export/progent.json": "progent.json",
   "artifacts/export/assay.yaml": "assay.yaml",
   "eval/results/crosstenant.json": "crosstenant.json",
+  "eval/results/agentdojo.json": "agentdojo.json",
 };
 for (const [src, dst] of Object.entries(files)) {
   const from = join(root, src);

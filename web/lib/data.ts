@@ -16,7 +16,7 @@ async function text(path: string): Promise<string> {
 
 export async function loadSnapshot(): Promise<Snapshot> {
   const base = "/demo";
-  const [catalog, invariants, policy, verify, details, bench, live, hook, assay, progent] = await Promise.all([
+  const [catalog, invariants, policy, verify, details, bench, live, hook, assay, progent, agentdojo] = await Promise.all([
     json<Snapshot["catalog"]>(`${base}/catalog.json`),
     json<Snapshot["invariants"]>(`${base}/invariants.json`),
     json<Snapshot["policy"]>(`${base}/policy.json`),
@@ -27,8 +27,9 @@ export async function loadSnapshot(): Promise<Snapshot> {
     text(`${base}/acc_hook.py.txt`),
     text(`${base}/assay.yaml`),
     json<Snapshot["progent"]>(`${base}/progent.json`),
+    json<Snapshot["agentdojo"]>(`${base}/agentdojo.json`),
   ]);
-  return { catalog, invariants, policy, verify, details, bench, live, hook, assay, progent };
+  return { catalog, invariants, policy, verify, details, bench, live, hook, assay, progent, agentdojo };
 }
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
