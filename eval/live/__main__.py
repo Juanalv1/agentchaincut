@@ -18,7 +18,7 @@ import yaml
 
 from acc import llm as claude
 from acc.pipeline import run_pipeline
-from eval.live.agent import MODEL, SYSTEM_PROMPT, DirectBackend, ProxyBackend, poisoned_ticket, run_agent
+from eval.live.agent import MODEL, SPANISH_ATTACKS, SYSTEM_PROMPT, DirectBackend, ProxyBackend, poisoned_ticket, run_agent
 from proxy.core import Proxy
 from proxy.ledger import Ledger
 from world.data import World
@@ -48,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default=str(ROOT / "eval" / "results" / "live"))
     parser.add_argument("--policy", default=str(ROOT / "artifacts" / "policy.yaml"))
     parser.add_argument("--seed", type=int, default=26)
-    parser.add_argument("--attack", choices=["obvious", "subtle", "malicious"], default="obvious")
+    parser.add_argument("--attack", choices=["obvious", "subtle", "malicious", *SPANISH_ATTACKS], default="obvious")
     args = parser.parse_args(argv)
     if not claude.available():
         print("eval.live: needs ANTHROPIC_API_KEY (env or .env) and `pip install -e '.[llm]'`", file=sys.stderr)
