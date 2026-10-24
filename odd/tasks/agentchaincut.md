@@ -252,7 +252,7 @@ Integration rule: everyone codes against `contracts/` fixtures from hour 0.
 Route legend: **inline** = parent session; **delegated** = one bounded writer.
 
 - [x] **T01** Repo skeleton + `contracts/` JSON Schemas + fixtures for every artifact — delegated (2+ files)
-- [ ] **T02** Mock world: tickets, billing, mail FastMCP servers + seed data — delegated
+- [x] **T02** Mock world: tickets, billing, mail MCP servers (mcp 2.x `MCPServer`) + seed data — inline; branch `feat/t02-world`
 - [ ] **T03** Trace generator (6 legit task types, abuse set, fixed seed, provenance) — delegated
 - [ ] **T04** Discovery + leg classifier (hints → heuristic → cached LLM → sink default) — delegated
 - [ ] **T05** Invariant miner with filters, reject reasons, suggestion status — delegated
@@ -299,6 +299,8 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 - 2026-10-24: design drafted after idea refutation rounds and competitor analysis
   (estimated score ~7.3, own estimate, not independently reviewed). No code yet.
 - 2026-10-24: T01 done, commit `4b74719` (`feat(contracts): add repo skeleton, JSON schemas and fixtures`), merged to `main`. Review tier: medium (RDD off); writer self-verification plus parent re-run of `pytest` (49 passed). Route: delegated (writer trigger: 2+ non-trivial files). Evidence: `pytest` RED 38 failed / 11 passed against a NotImplementedError stub, then GREEN 49 passed; `pip install -e .[dev]` incl. ortools 9.15 and mcp 2.3 installed on Windows/Python 3.11. Fixture numbers are illustrative, not measured.
+
+- 2026-10-24: T02 done on `feat/t02-world` (stacked branches, one per task; PR/merge left to the team). `world/data.py` seeded backend (200 customers, invoices, tickets, outbox, trusted context with provenance) and `world/servers.py` (tickets/billing/mail on mcp 2.x `MCPServer`; servers built only with the backend service key). Evidence: `tests/test_world.py` RED (ImportError) then GREEN, full suite 60 passed; stdio round trip `python -m world.servers billing` listed tools and read `I-0001`. Packaging now installs `world`, `proxy`, `eval`, `api`; dependency pinned to `mcp>=2.3,<3` because FastMCP was renamed in 2.x. Tool signatures extend the illustrative fixture: `tickets.add_note(author)`, `billing.refund(currency)`.
 
 ## Next step
 

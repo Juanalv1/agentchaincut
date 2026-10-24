@@ -13,7 +13,7 @@ dependencies = [
     "pyyaml>=6.0",
     "ortools>=9.8",
     "networkx>=3.2",
-    "mcp>=1.2",
+    "mcp>=2.3,<3",
     "fastapi>=0.110",
     "uvicorn>=0.27",
 ]
@@ -25,7 +25,7 @@ dev = ["pytest>=8.0"]
 acc = "acc.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["acc*"]
+include = ["acc*", "world*", "proxy*", "eval*", "api*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
