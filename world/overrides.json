@@ -1,0 +1,6 @@
+{
+  "mail.send": {
+    "legs": {"U": false, "S": false, "X": true},
+    "rationale": "Manual override: outbound email to an arbitrary destination is the primary exfiltration sink."
+  }
+}

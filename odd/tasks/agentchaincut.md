@@ -254,7 +254,7 @@ Route legend: **inline** = parent session; **delegated** = one bounded writer.
 - [x] **T01** Repo skeleton + `contracts/` JSON Schemas + fixtures for every artifact — delegated (2+ files)
 - [x] **T02** Mock world: tickets, billing, mail MCP servers (mcp 2.x `MCPServer`) + seed data — inline; commit `f3978d5` on `main`
 - [x] **T03** Trace generator (6 legit task types, 8 abuse families, fixed seed, provenance) — inline; on `main`
-- [ ] **T04** Discovery + leg classifier (hints → heuristic → cached LLM → sink default) — delegated
+- [x] **T04** Discovery + leg classifier (overrides → MCP hints → verb heuristic → cached LLM → sink default) — inline; on `main`
 - [ ] **T05** Invariant miner with filters, reject reasons, suggestion status — delegated
 - [ ] **T06** Reachability prover (before path, scripted calls) — delegated
 - [ ] **T07** CP-SAT optimizer + unsat core → conflict report + split-agent re-solve — delegated
@@ -302,6 +302,7 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 
 - 2026-10-24: Team decision (user, verbatim): "todo va a main". Work is committed and pushed straight to `main`; no feature branches or PRs. The README "one branch per task" rule no longer applies.
 - 2026-10-24: T03 done. `acc/traces.py`: six legit task types and eight abuse families (`foreign_recipient`, `cross_tenant_recipient`, `foreign_object_id`, `cross_ticket`, `injected_context`, `foreign_refund`, `bulk_exfil`, `excess_refund`); the last call of an abuse trace is the malicious one; `split_customers` gives disjoint training/held-out tenants (120/80). Mutating calls are recorded, not executed. Seeded on purpose so the miner meets every reject reason: `author == agent.id` (constant), `currency == customer.currency` (3 values), `to == ticket.reporter_email` (user provenance), `invoice_id == customer.last_invoice_id` (60% coincidence). Evidence: `tests/test_traces.py` 8 tests, full suite 68 passed. RED was not run separately: the implementation was written before the first test run.
+- 2026-10-24: T04 done. `acc/discover.py` lists tools over MCP and infers argument roles from names; `acc/classify.py` labels legs in the order manual override (`world/overrides.json`) → MCP hints → verb heuristic → cached LLM → fail-closed sink. The LLM fallback (`claude-opus-5-5`, optional extra `[llm]`, server-side refusal fallback) sends no `temperature` because the current API rejects it: determinism comes from the on-disk cache. Evidence: `tests/test_classify.py` RED (ImportError) then GREEN, full suite 76 passed; no live LLM call was made (not-measured).
 
 ## Next step
 

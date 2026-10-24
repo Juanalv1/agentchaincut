@@ -20,6 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+llm = ["anthropic>=1.0"]
 
 [project.scripts]
 acc = "acc.cli:main"
