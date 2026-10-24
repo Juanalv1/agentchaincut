@@ -286,15 +286,17 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 
 ## Open questions
 
-- Confirm the team repo (`platanus-hack-26-ve-team-21`, AI Security, still template as of
-  ~06:05 local) and whether this document moves into it.
+- Team repo confirmed: `platanus-hack-26-ve-team-21`. Work happens in `Juanalv1/agentchaincut`
+  and is mirrored there with full history before submission.
+- Role assignment (P1–P5) is pending; see `docs/GUIA-EQUIPO.md`.
 
 ## Progress
 
 - 2026-10-24: design drafted after idea refutation rounds and competitor analysis
   (estimated score ~7.3, own estimate, not independently reviewed). No code yet.
-- 2026-10-24: T01 done on branch `feat/t01-contracts`, commit `feat(contracts): add repo skeleton, JSON schemas and fixtures` (a commit cannot embed its own hash; see `git log feat/t01-contracts`). Route: delegated (writer trigger: 2+ non-trivial files). Evidence: `pytest` RED 38 failed / 11 passed against a NotImplementedError stub, then GREEN 49 passed; `pip install -e .[dev]` incl. ortools 9.15 and mcp 2.3 installed on Windows/Python 3.11. Fixture numbers are illustrative, not measured.
+- 2026-10-24: T01 done, commit `4b74719` (`feat(contracts): add repo skeleton, JSON schemas and fixtures`), merged to `main`. Review tier: medium (RDD off); writer self-verification plus parent re-run of `pytest` (49 passed). Route: delegated (writer trigger: 2+ non-trivial files). Evidence: `pytest` RED 38 failed / 11 passed against a NotImplementedError stub, then GREEN 49 passed; `pip install -e .[dev]` incl. ortools 9.15 and mcp 2.3 installed on Windows/Python 3.11. Fixture numbers are illustrative, not measured.
 
 ## Next step
 
-Review/merge `feat/t01-contracts`, then start T02–T05 in parallel against `contracts/fixtures/`.
+Assign roles, then start T02–T05 in parallel against `contracts/fixtures/`, one branch and PR per task.
+Team onboarding (Spanish, with diagrams): `docs/GUIA-EQUIPO.md`.

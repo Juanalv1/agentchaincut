@@ -4,8 +4,18 @@ Compile and prove least-privilege policies for MCP-connected AI agents.
 
 **What exists and runs today:** the artifact contracts (JSON Schemas + validated fixtures),
 contract helpers in `acc/contracts.py`, the package skeleton and a stub `acc` CLI.
-The pipeline itself is not implemented yet. Design, architecture and task list:
-[`odd/tasks/agentchaincut.md`](odd/tasks/agentchaincut.md).
+The pipeline itself is not implemented yet.
+
+| Read this | For |
+|---|---|
+| [`docs/GUIA-EQUIPO.md`](docs/GUIA-EQUIPO.md) | Team onboarding in Spanish, with diagrams: the problem, the idea, roles, how to start |
+| [`odd/tasks/agentchaincut.md`](odd/tasks/agentchaincut.md) | Design, contracts, algorithms, evaluation and the T01–T17 task list |
+
+## Workflow
+
+- `main` is the shared base; one branch per task (e.g. `feat/t05-miner`) and a PR back to `main`.
+- One Conventional Commit per task; tick the task in `odd/tasks/agentchaincut.md` with evidence.
+- Do not change a schema in `contracts/` without telling the team: schemas reject unknown fields.
 
 ## Quickstart
 
