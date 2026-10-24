@@ -954,3 +954,55 @@ footer {
     height: 420px;
   }
 }
+
+/* Office floor: departments = MCP servers, the agent walks through real tool calls. */
+.office { margin-top: 32px; border: 1px solid var(--line); background: var(--panel); padding: 20px; }
+.office-bar { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.office-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.office-tabs .tab { font: inherit; font-family: var(--font-mono); font-size: 13px; padding: 8px 14px; background: transparent; color: var(--text-dim); border: 1px solid var(--line); cursor: pointer; }
+.office-tabs .tab[data-on="true"] { color: var(--text); border-color: var(--magenta); }
+.floor {
+  position: relative; display: grid; gap: 12px; min-height: 260px;
+  grid-template-columns: 1fr 0.8fr 1fr 1fr 1fr; grid-template-areas: "lobby desk tickets billing mail";
+  background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 24px 24px; padding: 12px;
+}
+.office[data-mode="unprotected"] .floor { grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-areas: "lobby tickets billing mail"; }
+.room, .desk { position: relative; border: 2px solid var(--line); background: var(--ground); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; transition: border-color .3s, box-shadow .3s; }
+.room.lobby { grid-area: lobby; }
+.room[data-dept="tickets"] { grid-area: tickets; }
+.room[data-dept="billing"] { grid-area: billing; }
+.room[data-dept="mail"] { grid-area: mail; }
+.room[data-active="true"] { border-color: var(--yellow); box-shadow: 0 0 0 4px rgba(255, 220, 0, .12); }
+.room[data-blocked="true"] { border-color: var(--magenta); box-shadow: 0 0 0 4px rgba(229, 58, 163, .18); }
+.room-name { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--text); }
+.room-server { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+.desk { grid-area: desk; border-style: dashed; border-color: var(--clay); align-items: center; justify-content: center; gap: 12px; text-align: center; }
+.stamp { font-family: var(--font-mono); font-weight: 700; text-transform: uppercase; padding: 4px 10px; border: 2px solid currentColor; animation: stamp .35s ease-out; }
+.stamp[data-d="allow"] { color: var(--yellow); }
+.stamp[data-d="deny"] { color: var(--magenta-text); }
+@keyframes stamp { from { transform: scale(1.8) rotate(-12deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
+.agent { position: absolute; bottom: 24px; width: 20px; height: 36px; transition: left 1s steps(10), transform .2s; left: 8%; pointer-events: none; }
+.agent-head { display: block; width: 12px; height: 12px; margin: 0 auto; background: var(--clay); }
+.agent-body { display: block; width: 20px; height: 22px; margin-top: 2px; background: var(--text); animation: walk .4s steps(2) infinite; }
+.agent[data-d="deny"] .agent-body { background: var(--magenta); animation: none; }
+@keyframes walk { 50% { transform: translateY(-2px); } }
+.office[data-mode="protected"] .agent[data-at="tickets"] { left: 50%; }
+.office[data-mode="protected"] .agent[data-at="billing"] { left: 70%; }
+.office[data-mode="protected"] .agent[data-at="mail"] { left: 90%; }
+.office[data-mode="unprotected"] .agent[data-at="tickets"] { left: 34%; }
+.office[data-mode="unprotected"] .agent[data-at="billing"] { left: 59%; }
+.office[data-mode="unprotected"] .agent[data-at="mail"] { left: 85%; }
+.office-log { list-style: none; margin: 20px 0 0; padding: 0; font-family: var(--font-mono); font-size: 13px; display: grid; gap: 8px; }
+.log-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; animation: fadein .3s; }
+.log-line.verdict[data-tone="bad"] { color: var(--magenta-text); }
+.log-line.verdict[data-tone="good"] { color: var(--yellow); }
+.cursor::after { content: "▌"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes fadein { from { opacity: 0; transform: translateY(4px); } }
+@media (max-width: 720px) {
+  .floor, .office[data-mode="unprotected"] .floor { grid-template-columns: 1fr 1fr; grid-template-areas: "lobby desk" "tickets billing" "mail mail"; }
+  .office[data-mode="unprotected"] .floor { grid-template-areas: "lobby tickets" "billing mail"; }
+  .agent { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .agent, .agent-body, .stamp, .log-line { animation: none; transition: none; } }

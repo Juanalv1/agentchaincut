@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { OfficeFloor } from "@/components/OfficeFloor";
 import { ToolGraph } from "@/components/ToolGraph";
 import { ArcPairs, Blocks, HeroScene, LogoPixels } from "@/components/Pixels";
 import { API_URL, api, loadSnapshot } from "@/lib/data";
@@ -244,6 +245,17 @@ export function Dashboard({ lang }: { lang: Lang }) {
                 </button>
               </p>
             )}
+          </div>
+        </section>
+
+        <section id="office">
+          <div className="wrap">
+            <div className="narrow">
+              <p className="label">{t.officeLabel}</p>
+              <h2 className="big">{t.officeTitle}</h2>
+              <p className="lede">{t.officeBody}</p>
+            </div>
+            <OfficeFloor attack={attack} t={t} running={running} onRun={LIVE ? runAttack : undefined} />
           </div>
         </section>
 
