@@ -26,3 +26,6 @@ Thumbs.db
 
 # Pipeline output (regenerate with `acc run world/`)
 artifacts/
+
+# Local gentle-ai skill registry (auto-generated per machine)
+.atl/
