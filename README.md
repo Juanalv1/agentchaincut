@@ -1,19 +1,79 @@
 # AgentChainCut
 
-Compile and prove least-privilege policies for MCP-connected AI agents.
+Compute and prove least-privilege policies for MCP-connected AI agents, then enforce them in a
+proxy that holds the credentials.
 
-> **First version.** The specs, plan, roles and scope below are a starting point, not a final
-> decision. The team is free to review and change them to make the project as strong as possible;
-> keep `docs/GUIA-EQUIPO.md` and `odd/tasks/agentchaincut.md` in sync when you do.
+Support agents run with credentials that reach every customer, while each session is about one
+customer. A poisoned ticket makes the agent read another customer's invoice and email it out —
+nothing is hacked, the agent uses permissions it already had. AgentChainCut mines the rules that
+legitimate work always follows (`mail.send.to == ticket.customer.email`,
+`invoice_id ∈ customer.invoice_ids`), picks the narrowest policy with a CP-SAT solver under
+Meta's Agents Rule of Two, verifies it on unseen customers and attacks, and enforces it in an MCP
+proxy with a hash-chained decision ledger.
 
-**What exists and runs today:** the artifact contracts (JSON Schemas + validated fixtures),
-contract helpers in `acc/contracts.py`, the package skeleton and a stub `acc` CLI.
-The pipeline itself is not implemented yet.
+## What runs today (one command per claim)
 
-| Read this | For |
+```bash
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+pytest                                               # 146 tests
+```
+
+| Claim | Command | Result (seed 26) |
+|---|---|---|
+| Full pipeline: discover → classify → traces → mine → CP-SAT → verify → export | `acc run world/ --out artifacts` | ~1 s, every artifact schema-validated |
+| The abuse path exists before the policy and is refused after it | same, see `artifacts/reachability.json` | before: allowed (victim invoice reaches `attacker@evil.test`); after: refused at `billing.invoice_read` |
+| Mined rules bind arguments to the session; bad candidates are rejected with a reason | `artifacts/invariants.json` | 5 accepted; rejected: constant, distinct<5, untrusted_ctx, coincidental ×2 |
+| The solver keeps all legit work and explains its one conflict | `artifacts/policy.yaml` | OPTIMAL, 0 broken tasks; `refund_request` needs U+S+X → human approval on `billing.refund` (or split the agent) |
+| Held-out customers pass, attacks are blocked | `artifacts/verify.json` | 200/200 legit, 300/300 abuse blocked, 0 false denies (measured) |
+| Cross-tenant benchmark vs baselines | `python -m eval.crosstenant` | attack success: none 100%, taint-only 25.0% (and 17% false denies), static allowlist 52.3%, **AgentChainCut 0.0%** with 100% utility (n=300/200) |
+| AgentDojo, policy level | `python -m eval.agentdojo` | 11.6% of attacks pass automatically, 75.3% wait for approval, utility 86.6% counting approvals — see the honest reading in `eval/results/agentdojo.md` |
+| Enforcing proxy over MCP stdio | `python -m proxy --policy artifacts/policy.yaml` | denied tools are not even advertised; every decision is ledgered |
+| API + live demo endpoints + SSE | `python -m api` | `POST /live/attack`, `GET /events`, `GET /ledger/verify`, … |
+| Dashboard (static, offline replay or live) | `cd web && npm install && npm run sync && npm run build` | `npx serve web/out` |
+| Exports | `artifacts/export/` | Claude Code PreToolUse hook, Progent-style JSON, Assay-style YAML |
+
+Not measured yet: the LLM-written-policy baseline and the live Claude agent run need an
+`ANTHROPIC_API_KEY` (env or git-ignored `.env`, plus `pip install -e ".[llm]"`), then
+`python -m eval.crosstenant` and `python -m eval.live --runs 3`.
+
+## How it works
+
+```
+offline (file → file)                                                live
+MCP servers → discover → classify U/S/X → traces → mine → CP-SAT → verify → export
+                                                                  │ policy.yaml
+agent ──MCP──▶ PROXY (credentials, session context, policy engine, ledger) ──▶ MCP servers
+                                  │ SSE
+                          FastAPI ─┴─▶ dashboard
+```
+
+- **Rule of Two:** a session should not combine untrusted input (U), sensitive data (S) and an
+  external effect (X). U and S stay present when used; X is neutralized by human approval or by
+  binding every steerable argument (object id, destination, amount) to trusted session context.
+- **The LLM never grants permissions.** It may label unknown tools (cached); the policy comes
+  from mined rules and the solver.
+- **Trusted context comes from the backend,** fetched by the proxy at session start, never from
+  agent text. Unknown session, unknown tool or engine error → deny.
+- **Every number** comes from a deterministic check, carries its n and a
+  `measured | assumed | not-measured` label.
+
+Declared limits: free-form SQL arguments, server-side bugs, the residual channels listed in
+`verify.json` (lower bound), and a synthetic world modeled on Zendesk / Stripe / Gmail-like APIs.
+
+## Repository
+
+| Path | What |
 |---|---|
-| [`docs/GUIA-EQUIPO.md`](docs/GUIA-EQUIPO.md) | Team onboarding in Spanish, with diagrams: the problem, the idea, roles, how to start |
-| [`odd/tasks/agentchaincut.md`](odd/tasks/agentchaincut.md) | Design, contracts, algorithms, evaluation and the T01–T17 task list |
+| `contracts/` | JSON Schemas for every artifact + fixtures (`acc/contracts.py` helpers) |
+| `acc/` | pipeline: `discover`, `classify`, `traces`, `miner`, `optimizer`, `reachability`, `variants`, `verifier`, `policy_engine`, `pipeline`, `export/`, CLI `acc` |
+| `world/` | seeded support world (200 customers) and MCP servers (mcp 2.x `MCPServer`) |
+| `proxy/` | credential-holding MCP proxy and hash-chained ledger |
+| `eval/` | `baselines/`, `crosstenant/`, `agentdojo/`, `live/`, `results/` |
+| `api/` | FastAPI service |
+| `web/` | Next.js + React Flow dashboard |
+| `docs/GUIA-EQUIPO.md` | team onboarding (Spanish) |
+| `odd/tasks/agentchaincut.md` | design, contracts, tasks T01–T17 and the work log |
 
 ## Workflow
 
@@ -22,51 +82,3 @@ The pipeline itself is not implemented yet.
 - Conventional Commits ending with a `Status: pending | in-progress | done` trailer; tick the task
   in `odd/tasks/agentchaincut.md` with evidence.
 - Do not change a schema in `contracts/` without telling the team: schemas reject unknown fields.
-
-## Quickstart
-
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
-pip install -e ".[dev]"
-pytest
-```
-
-`acc run world/` exists but exits non-zero with "not implemented" until the pipeline lands.
-
-## Contracts
-
-Every pipeline artifact has a JSON Schema (draft 2020-12) in `contracts/` and a small,
-mutually consistent fixture for the demo support-agent world in `contracts/fixtures/`.
-Code against the fixtures from hour 0; change a schema only in a dedicated commit, after telling the team.
-
-| Artifact | Schema | Fixture | Format |
-|---|---|---|---|
-| Tool catalog (legs U/S/X) | `catalog.schema.json` | `catalog.json` | JSON array |
-| Trace session | `trace.schema.json` | `traces.jsonl` | one session per line |
-| Mined invariants | `invariants.schema.json` | `invariants.json` | JSON array |
-| Policy | `policy.schema.json` | `policy.yaml` | YAML, validated as JSON |
-| Verification report | `verify.schema.json` | `verify.json` | JSON object |
-| Proxy decision ledger | `ledger_entry.schema.json` | `ledger.jsonl` | one entry per line, hash-chained |
-
-Helpers (`from acc import contracts`):
-
-- `load_schema(name)`, `validate(name, obj)` — raise `jsonschema.ValidationError` on failure.
-- `validate_file(path, schema=None)` — `.json`, `.jsonl` (per line), `.yaml`/`.yml`; the schema
-  is inferred from the file name (`catalog*`, `trace*`, `invariants*`, `policy*`, `verify*`, `ledger*`).
-- `canonical_json(obj)`, `ledger_hash(prev, entry)`, `verify_ledger(entries)` — ledger chain:
-  `hash = sha256(prev + canonical_json(entry without "hash"))`, first `prev` is 64 zeros,
-  `args_hash = sha256(canonical_json(args))`.
-
-Fixture numbers (support counts, 200/300 verify totals) are illustrative, not measured.
-
-## Layout
-
-| Path | Owner | Purpose |
-|---|---|---|
-| `contracts/` | all | schemas + fixtures |
-| `acc/` | P2–P4 | pipeline package and `acc` CLI; `acc/export/` policy exporters |
-| `world/` | P1 | mock tickets / billing / mail MCP servers |
-| `proxy/` | P1 | credential-holding MCP proxy, policy engine, ledger |
-| `eval/` | P2, P3 | `crosstenant/`, `agentdojo/`, `baselines/` |
-| `api/` | P5 | FastAPI service |

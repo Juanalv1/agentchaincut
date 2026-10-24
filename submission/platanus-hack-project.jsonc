@@ -1,0 +1,14 @@
+// Draft for platanus-hack/platanus-hack-26-ve-team-21 (copy there when the team decides).
+{
+  // Your project's name, as it will appear on the voting page.
+  "project-name": "AgentChainCut",
+
+  // Short one-line summary of your project (in Spanish).
+  "project-oneliner-spanish": "Calculamos y probamos el mínimo privilegio para agentes de IA conectados por MCP, y lo hacemos cumplir en un proxy que guarda las credenciales.",
+
+  // Brief description of your project (in Spanish).
+  "project-description-spanish": "Los agentes de soporte usan credenciales que alcanzan a todos los clientes, aunque cada conversación sea sobre uno solo. AgentChainCut aprende de trazas legítimas las reglas que atan cada argumento a la sesión (por ejemplo, el correo solo va al cliente del ticket), elige la política más estrecha con un resolvedor CP-SAT bajo la Regla de Dos, la verifica con clientes nuevos y ataques, y la aplica en un proxy MCP con un registro encadenado por hashes.",
+
+  // Public URL where your project is deployed and running.
+  "deploy-url": "<PENDING: deploy decision by the team>"
+}
