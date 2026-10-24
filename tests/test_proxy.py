@@ -155,3 +155,12 @@ def test_agent_talks_mcp_to_the_proxy_only() -> None:
     assert ticket_json["id"] == ticket.id
     assert denied is True
     assert world.outbox == []
+
+
+def test_invalid_arguments_from_the_agent_return_an_error_instead_of_crashing() -> None:
+    world, proxy = _proxy()
+    ticket = world.open_ticket("C-010", "Hi", "x")
+    session = proxy.start_session(ticket.id)
+    out = _run(proxy.call(session, "tickets.add_note", {"ticket_id": ticket.id, "body": ["not", "a", "string"]}))
+    assert out["decision"] == "allow" and "error" in out
+    assert len(proxy.ledger.entries) == 1

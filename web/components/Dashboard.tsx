@@ -426,7 +426,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
                           <td><code>{key.includes(":") ? key.replace(":", " · ") : `${key} · obvious`}</code></td>
                           <td className="num">{s.unprotected.leaked}/{s.unprotected.n}</td>
                           <td className="num">{s.protected.leaked}/{s.protected.n}</td>
-                          <td className="num">{s.protected.replied_to_customer ?? "—"}/{s.protected.n}</td>
+                          <td className="num">{s.protected.answered_customer ?? s.protected.replied_to_customer ?? "—"}/{s.protected.n}</td>
                         </tr>
                       ))}
                     </tbody>

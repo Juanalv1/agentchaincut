@@ -7,16 +7,16 @@
       "usd": 2.2526
     },
     "claude-haiku-5-5": {
-      "calls": 274,
-      "input_tokens": 514877,
-      "output_tokens": 69439,
-      "usd": 0.0862
+      "calls": 408,
+      "input_tokens": 764019,
+      "output_tokens": 101957,
+      "usd": 0.1274
     },
     "claude-haiku-4-5-20251001": {
-      "calls": 240,
-      "input_tokens": 408269,
-      "output_tokens": 39350,
-      "usd": 2.4201
+      "calls": 350,
+      "input_tokens": 650295,
+      "output_tokens": 62802,
+      "usd": 3.8572
     },
     "claude-sonnet-5-5": {
       "calls": 43,
@@ -25,5 +25,5 @@
       "usd": 0.2039
     }
   },
-  "usd": 4.9628
+  "usd": 6.4411
 }

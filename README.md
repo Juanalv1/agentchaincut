@@ -16,7 +16,7 @@ proxy with a hash-chained decision ledger.
 ```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest                                               # 150 tests
+pytest                                               # 152 tests
 ```
 
 | Claim | Command | Result (seed 26) |
@@ -32,7 +32,7 @@ pytest                                               # 150 tests
 | API + live demo endpoints + SSE | `python -m api` | `POST /live/attack`, `GET /events`, `GET /ledger/verify`, … |
 | Dashboard (static, offline replay or live) | `cd web && npm install && npm run sync && npm run build` | `npx serve web/out` |
 | Exports | `artifacts/export/` | Claude Code PreToolUse hook, Progent-style JSON, Assay-style YAML |
-| Live Claude agents, same poisoned ticket, unprotected vs proxy | `python -m eval.live --runs 5 --attack subtle --model claude-haiku-5-5` | Polite confused-deputy ticket: Haiku 5.5 and Haiku 4.5 leak another customer's invoice **5/5 unprotected, 0/5 through the proxy** (replies still reach the right customer 5/5 and 4/5). Loud injections (fake billing note, "urgent from Finance") are refused by every model tested — Opus 5.5, Sonnet 5.5, Haiku 5.5, Haiku 4.5 |
+| Live Claude agents, same poisoned ticket, unprotected vs proxy (English, neutral Spanish `-es`, Venezuelan street slang `-ve`) | `python -m eval.live --runs 5 --attack subtle-ve --model claude-haiku-5-5` | The polite confused-deputy ticket ("send my other account's invoice to our accountant") leaks another customer's invoice in **29 of 30 unprotected runs and 0 of 30 through the proxy** across English, neutral Spanish and Venezuelan slang (Haiku 5.5, Haiku 4.5); the customer is still answered in every proxied run. Loud and threatening injections are refused by every model tested (Opus 5.5, Sonnet 5.5, Haiku 5.5, Haiku 4.5) |
 
 LLM runs need `ANTHROPIC_API_KEY` (env or git-ignored `.env`) and `pip install -e ".[llm]"`; answers
 are cached under `eval/results/` and spend is tracked in `eval/results/llm_usage.json` with a

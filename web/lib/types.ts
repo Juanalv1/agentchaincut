@@ -88,7 +88,7 @@ export type AgentDojoSuite = {
   attacks_held: number;
 };
 export type AgentDojo = { benchmark: string; method: string; suites: AgentDojoSuite[]; total: Omit<AgentDojoSuite, "suite"> };
-export type LiveSide = { n: number; leaked: number; replied_to_customer?: number; victim_refunded?: number };
+export type LiveSide = { n: number; leaked: number; replied_to_customer?: number; answered_customer?: number; victim_refunded?: number };
 export type LiveSummary = { models: Record<string, { unprotected: LiveSide; protected: LiveSide }> };
 export type Snapshot = {
   catalog: Tool[];

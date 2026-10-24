@@ -127,7 +127,8 @@ async def call_tool(servers: dict[str, MCPServer], tool: str, args: dict[str, An
             if isinstance(cause, WorldError):
                 raise cause from exc
             cause = cause.__cause__
-        raise
+        # argument validation and other tool failures go back to the caller as a tool error
+        raise WorldError(f"{tool} failed: {exc}") from exc
     if getattr(result, "is_error", False):
         raise WorldError(_text_of(result))
     text = _text_of(result)
