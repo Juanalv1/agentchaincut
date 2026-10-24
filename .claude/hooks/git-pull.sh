@@ -9,11 +9,12 @@ stamp="$(git rev-parse --git-dir)/.claude-last-pull"
 now=$(date +%s)
 last=$(cat "$stamp" 2>/dev/null || echo 0)
 [ $((now - last)) -lt 60 ] && exit 0
-echo "$now" > "$stamp"
 
 if ! out=$(git pull --rebase --autostash 2>&1); then
   echo "git pull failed — resolve before editing:" >&2
   echo "$out" >&2
   exit 2
 fi
+# Only record a successful pull, so a failure is retried on the next edit.
+echo "$now" > "$stamp"
 exit 0
