@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentchaincut.dev/contracts/ledger_entry.schema.json",
+  "title": "Ledger entry",
+  "description": "One line of ledger.jsonl: a proxy decision. hash = sha256_hex(prev + canonical_json(entry without 'hash')), canonical_json = json.dumps(obj, sort_keys=True, separators=(',', ':')). The first prev is 64 zeros. args_hash = sha256_hex(canonical_json(args)). See acc.contracts.ledger_hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seq", "ts", "session_id", "tool", "args_hash", "decision", "rule", "reason", "prev", "hash"],
+  "properties": {
+    "seq": {"type": "integer", "minimum": 1},
+    "ts": {"type": "string", "format": "date-time"},
+    "session_id": {"type": "string", "minLength": 1},
+    "tool": {"type": "string", "minLength": 1, "description": "Requested tool name; may be unknown to the catalog (then denied)."},
+    "args_hash": {"$ref": "#/$defs/sha256"},
+    "decision": {"enum": ["allow", "deny", "approval"]},
+    "rule": {"type": ["string", "null"], "description": "Invariant id or rule name that decided; null when no specific rule applied."},
+    "reason": {"type": "string"},
+    "prev": {"$ref": "#/$defs/sha256"},
+    "hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

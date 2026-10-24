@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentchaincut.dev/contracts/catalog.schema.json",
+  "title": "Tool catalog",
+  "description": "catalog.json: one entry per discovered MCP tool with its Rule-of-Two legs (U = untrusted input, S = sensitive data, X = external effect). Leg classification order: MCP hints -> verb heuristic -> LLM (cached, temperature 0) -> default sink (X=true). Manual overrides win.",
+  "type": "array",
+  "items": {"$ref": "#/$defs/tool"},
+  "$defs": {
+    "toolName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$",
+      "description": "<server>.<tool>, e.g. billing.invoice_read"
+    },
+    "arg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "role"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "type": {"enum": ["string", "integer", "number", "boolean", "array", "object"]},
+        "role": {
+          "enum": ["object_id", "destination", "content", "amount", "filter", "other"],
+          "description": "object_id and destination are attacker-controllable and must be bound by an invariant to neutralize a leg."
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "server", "args", "legs", "annotations", "source", "rationale"],
+      "properties": {
+        "tool": {"$ref": "#/$defs/toolName"},
+        "server": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "description": {"type": "string"},
+        "args": {"type": "array", "items": {"$ref": "#/$defs/arg"}},
+        "legs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["U", "S", "X"],
+          "properties": {
+            "U": {"type": "boolean"},
+            "S": {"type": "boolean"},
+            "X": {"type": "boolean"}
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "description": "MCP tool annotations as reported by the server.",
+          "additionalProperties": false,
+          "properties": {
+            "title": {"type": "string"},
+            "readOnlyHint": {"type": "boolean"},
+            "destructiveHint": {"type": "boolean"},
+            "idempotentHint": {"type": "boolean"},
+            "openWorldHint": {"type": "boolean"}
+          }
+        },
+        "source": {"enum": ["mcp_hint", "heuristic", "llm", "manual"]},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

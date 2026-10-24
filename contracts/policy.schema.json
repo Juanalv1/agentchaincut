@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentchaincut.dev/contracts/policy.schema.json",
+  "title": "Least-privilege policy",
+  "description": "policy.yaml (YAML document validated as JSON): per-agent tool modes chosen by the optimizer, solver result and conflict reports. Tools not listed for an agent are denied (fail-closed).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agents", "legs_per_session", "solver", "conflicts"],
+  "properties": {
+    "agents": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/agent"}},
+    "legs_per_session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["U", "S", "X"],
+      "properties": {
+        "U": {"$ref": "#/$defs/legState"},
+        "S": {"$ref": "#/$defs/legState"},
+        "X": {"$ref": "#/$defs/legState"}
+      }
+    },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "objective", "broken_tasks"],
+      "properties": {
+        "status": {"enum": ["OPTIMAL", "FEASIBLE", "INFEASIBLE", "UNKNOWN", "MODEL_INVALID"]},
+        "method": {"enum": ["cp-sat", "exhaustive"], "description": "'exhaustive' marks the fallback search; label it as such in the UI."},
+        "objective": {"type": "number"},
+        "broken_tasks": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "conflicts": {"type": "array", "items": {"$ref": "#/$defs/conflict"}}
+  },
+  "$defs": {
+    "toolName": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"},
+    "leg": {"enum": ["U", "S", "X"]},
+    "legState": {
+      "description": "true = leg present, false = absent, 'bounded' = present but neutralized by scoped constraints or approval.",
+      "oneOf": [{"type": "boolean"}, {"const": "bounded"}]
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arg", "op", "ctx"],
+      "properties": {
+        "arg": {"type": "string", "minLength": 1},
+        "op": {"enum": ["eq", "in"]},
+        "ctx": {"type": "string", "pattern": "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$"},
+        "invariant": {"type": "string", "pattern": "^inv-[0-9]+$", "description": "Source invariant id; reported as the ledger rule."}
+      }
+    },
+    "toolRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["allow", "scoped", "approval", "deny"]},
+        "constraints": {"type": "array", "items": {"$ref": "#/$defs/constraint"}}
+      },
+      "if": {"properties": {"mode": {"const": "scoped"}}},
+      "then": {"required": ["constraints"], "properties": {"constraints": {"minItems": 1}}}
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "tools"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "tools": {
+          "type": "object",
+          "description": "Tool name -> rule.",
+          "propertyNames": {"$ref": "#/$defs/toolName"},
+          "additionalProperties": {"$ref": "#/$defs/toolRule"}
+        }
+      }
+    },
+    "fix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {"enum": ["approval_edge", "split_agent"]},
+        "tool": {"$ref": "#/$defs/toolName"},
+        "partition": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/toolName"}}
+        }
+      },
+      "allOf": [
+        {"if": {"properties": {"type": {"const": "approval_edge"}}}, "then": {"required": ["tool"]}},
+        {"if": {"properties": {"type": {"const": "split_agent"}}}, "then": {"required": ["partition"]}}
+      ]
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task", "legs", "core", "fixes"],
+      "properties": {
+        "task": {"type": "string", "minLength": 1},
+        "legs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/leg"}},
+        "core": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/toolName"}, "description": "Minimal infeasible core (tools)."},
+        "fixes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/fix"}},
+        "resolved_by": {"enum": ["approval_edge", "split_agent"], "description": "Fix applied in this policy, if any."}
+      }
+    }
+  }
+}

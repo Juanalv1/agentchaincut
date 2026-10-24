@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentchaincut.dev/contracts/invariants.schema.json",
+  "title": "Mined invariants",
+  "description": "invariants.json: relational candidates 'arg op ctx_path' mined from legit traces. A candidate passes only with 0 violations, >=5 distinct values, system provenance and no constants; otherwise it is rejected with a reason. 'suggested' passed the filters and awaits human approval; 'accepted' was approved.",
+  "type": "array",
+  "items": {"$ref": "#/$defs/invariant"},
+  "$defs": {
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tool", "arg", "op", "ctx_path", "support", "distinct", "violations", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^inv-[0-9]+$"},
+        "tool": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"},
+        "arg": {"type": "string", "minLength": 1},
+        "op": {"enum": ["eq", "in"]},
+        "ctx_path": {"type": "string", "pattern": "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$"},
+        "support": {"type": "integer", "minimum": 0, "description": "Legit calls where the candidate was evaluated."},
+        "distinct": {"type": "integer", "minimum": 0, "description": "Distinct argument values observed."},
+        "violations": {"type": "integer", "minimum": 0},
+        "status": {"enum": ["accepted", "rejected", "suggested"]},
+        "reject_reason": {"enum": ["constant", "distinct<5", "coincidental", "untrusted_ctx"]},
+        "note": {"type": "string", "description": "Human-readable explanation shown in the UI."}
+      },
+      "if": {"properties": {"status": {"const": "rejected"}}},
+      "then": {"required": ["reject_reason"]},
+      "else": {"not": {"required": ["reject_reason"]}}
+    }
+  }
+}

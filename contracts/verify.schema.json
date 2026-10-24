@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentchaincut.dev/contracts/verify.schema.json",
+  "title": "Verification report",
+  "description": "verify.json: reachability proof, held-out and abuse results, false denies, residual risk. Every headline number carries n and a measured|assumed|not-measured label.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reachability_before", "heldout", "abuse", "false_deny", "residual", "labels"],
+  "properties": {
+    "reachability_before": {"$ref": "#/$defs/path"},
+    "reachability_after": {"$ref": "#/$defs/path"},
+    "heldout": {
+      "type": "object", "additionalProperties": false, "required": ["n", "pass"],
+      "properties": {"n": {"$ref": "#/$defs/count"}, "pass": {"$ref": "#/$defs/count"}}
+    },
+    "abuse": {
+      "type": "object", "additionalProperties": false, "required": ["n", "blocked"],
+      "properties": {"n": {"$ref": "#/$defs/count"}, "blocked": {"$ref": "#/$defs/count"}}
+    },
+    "false_deny": {
+      "type": "object", "additionalProperties": false, "required": ["n", "count"],
+      "properties": {"n": {"$ref": "#/$defs/count"}, "count": {"$ref": "#/$defs/count"}}
+    },
+    "residual": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sink", "arg", "status", "claim"],
+        "properties": {
+          "sink": {"$ref": "#/$defs/toolName"},
+          "arg": {"type": "string", "minLength": 1},
+          "status": {"enum": ["unconstrained", "approval", "constrained"]},
+          "claim": {"enum": ["lower-bound"]}
+        }
+      }
+    },
+    "labels": {
+      "type": "object",
+      "description": "Claim label per reported metric or suite.",
+      "additionalProperties": {"enum": ["measured", "assumed", "not-measured"]}
+    }
+  },
+  "$defs": {
+    "count": {"type": "integer", "minimum": 0},
+    "toolName": {"type": "string", "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"},
+    "path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "legs"],
+      "properties": {
+        "path": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/toolName"}},
+        "legs": {"type": "array", "items": {"enum": ["U", "S", "X"]}},
+        "allowed": {"type": "boolean", "description": "Whether the scripted calls along the path were permitted."}
+      }
+    }
+  }
+}

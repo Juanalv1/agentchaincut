@@ -1,0 +1,54 @@
+[
+  {
+    "id": "inv-1", "tool": "billing.invoice_read", "arg": "invoice_id", "op": "in",
+    "ctx_path": "customer.invoice_ids", "support": 41, "distinct": 39, "violations": 0,
+    "status": "accepted",
+    "note": "Read-side rule: an invoice may only be read if it belongs to the ticket's customer."
+  },
+  {
+    "id": "inv-2", "tool": "billing.refund", "arg": "invoice_id", "op": "in",
+    "ctx_path": "customer.invoice_ids", "support": 12, "distinct": 12, "violations": 0,
+    "status": "accepted"
+  },
+  {
+    "id": "inv-3", "tool": "mail.send", "arg": "to", "op": "eq",
+    "ctx_path": "ticket.customer.email", "support": 37, "distinct": 37, "violations": 0,
+    "status": "accepted",
+    "note": "Send-side rule: replies only go to the ticket's customer."
+  },
+  {
+    "id": "inv-4", "tool": "tickets.add_note", "arg": "ticket_id", "op": "eq",
+    "ctx_path": "ticket.id", "support": 48, "distinct": 48, "violations": 0,
+    "status": "accepted"
+  },
+  {
+    "id": "inv-5", "tool": "tickets.get", "arg": "ticket_id", "op": "eq",
+    "ctx_path": "ticket.id", "support": 60, "distinct": 60, "violations": 0,
+    "status": "suggested",
+    "note": "Passes all filters; awaiting human approval."
+  },
+  {
+    "id": "inv-6", "tool": "tickets.add_note", "arg": "author", "op": "eq",
+    "ctx_path": "agent.id", "support": 48, "distinct": 1, "violations": 0,
+    "status": "rejected", "reject_reason": "constant",
+    "note": "Same value in every session; binds nothing session-specific."
+  },
+  {
+    "id": "inv-7", "tool": "billing.refund", "arg": "amount", "op": "eq",
+    "ctx_path": "invoice.last_amount", "support": 12, "distinct": 3, "violations": 0,
+    "status": "rejected", "reject_reason": "distinct<5",
+    "note": "Only 3 distinct amounts observed; too few to rule out coincidence."
+  },
+  {
+    "id": "inv-8", "tool": "mail.send", "arg": "to", "op": "eq",
+    "ctx_path": "ticket.reporter_email", "support": 37, "distinct": 37, "violations": 0,
+    "status": "rejected", "reject_reason": "untrusted_ctx",
+    "note": "reporter_email is typed by the customer (provenance 'user'), not fetched from the backend."
+  },
+  {
+    "id": "inv-9", "tool": "billing.invoice_read", "arg": "invoice_id", "op": "eq",
+    "ctx_path": "customer.last_invoice_id", "support": 41, "distinct": 39, "violations": 4,
+    "status": "rejected", "reject_reason": "coincidental",
+    "note": "Holds only when the customer asks about the latest invoice; broken by randomized traces."
+  }
+]

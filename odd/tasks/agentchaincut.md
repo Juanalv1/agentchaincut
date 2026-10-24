@@ -247,7 +247,7 @@ Integration rule: everyone codes against `contracts/` fixtures from hour 0.
 
 Route legend: **inline** = parent session; **delegated** = one bounded writer.
 
-- [ ] **T01** Repo skeleton + `contracts/` JSON Schemas + fixtures for every artifact — delegated (2+ files)
+- [x] **T01** Repo skeleton + `contracts/` JSON Schemas + fixtures for every artifact — delegated (2+ files)
 - [ ] **T02** Mock world: tickets, billing, mail FastMCP servers + seed data — delegated
 - [ ] **T03** Trace generator (6 legit task types, abuse set, fixed seed, provenance) — delegated
 - [ ] **T04** Discovery + leg classifier (hints → heuristic → cached LLM → sink default) — delegated
@@ -293,7 +293,8 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 
 - 2026-10-24: design drafted after idea refutation rounds and competitor analysis
   (estimated score ~7.3, own estimate, not independently reviewed). No code yet.
+- 2026-10-24: T01 done on branch `feat/t01-contracts`, commit `feat(contracts): add repo skeleton, JSON schemas and fixtures` (a commit cannot embed its own hash; see `git log feat/t01-contracts`). Route: delegated (writer trigger: 2+ non-trivial files). Evidence: `pytest` RED 38 failed / 11 passed against a NotImplementedError stub, then GREEN 49 passed; `pip install -e .[dev]` incl. ortools 9.15 and mcp 2.3 installed on Windows/Python 3.11. Fixture numbers are illustrative, not measured.
 
 ## Next step
 
-Confirm repo, then T01 (contracts + skeleton) so all five roles can start in parallel.
+Review/merge `feat/t01-contracts`, then start T02–T05 in parallel against `contracts/fixtures/`.
