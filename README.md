@@ -17,8 +17,10 @@ The pipeline itself is not implemented yet.
 
 ## Workflow
 
-- `main` is the shared base; one branch per task (e.g. `feat/t05-miner`) and a PR back to `main`.
-- One Conventional Commit per task; tick the task in `odd/tasks/agentchaincut.md` with evidence.
+- Everyone works directly on `main`: no feature branches, no PRs. `git pull --rebase --autostash`
+  before a change, commit and `git push` after it (see `CLAUDE.md`).
+- Conventional Commits ending with a `Status: pending | in-progress | done` trailer; tick the task
+  in `odd/tasks/agentchaincut.md` with evidence.
 - Do not change a schema in `contracts/` without telling the team: schemas reject unknown fields.
 
 ## Quickstart
@@ -36,7 +38,7 @@ pytest
 
 Every pipeline artifact has a JSON Schema (draft 2020-12) in `contracts/` and a small,
 mutually consistent fixture for the demo support-agent world in `contracts/fixtures/`.
-Code against the fixtures from hour 0; change a schema only in a dedicated PR.
+Code against the fixtures from hour 0; change a schema only in a dedicated commit, after telling the team.
 
 | Artifact | Schema | Fixture | Format |
 |---|---|---|---|

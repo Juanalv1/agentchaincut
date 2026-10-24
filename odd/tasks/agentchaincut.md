@@ -283,10 +283,8 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 
 ## Delivery
 
-- Strategy: `ask-on-risk`. Forecast clearly exceeds ~400 authored lines → chained-PR
-  strategy to be chosen before the first commit.
-- One work-unit commit per task on the feature branch (Conventional Commits).
-- Push / PR / merge are team decisions.
+- Everything is committed and pushed directly to `main`: no feature branches, no PRs (team decision, 2026-10-24).
+- Work-unit commits per task (Conventional Commits with a `Status:` trailer), pulled with `--rebase` before and pushed after each change.
 
 ## Open questions
 
@@ -307,5 +305,5 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 
 ## Next step
 
-Assign roles, then start T02–T05 in parallel against `contracts/fixtures/`, one branch and PR per task.
+Assign roles, then continue with the open tasks directly on `main`.
 Team onboarding (Spanish, with diagrams): `docs/GUIA-EQUIPO.md`.

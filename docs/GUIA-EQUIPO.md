@@ -247,9 +247,9 @@ La base ya existe en `main`: esqueleto del repo, formatos de datos y ejemplos (T
 - [ ] Clona el repo, crea un entorno virtual e instala: `python -m venv .venv` y `pip install -e ".[dev]"`
 - [ ] Corre `pytest` y confirma que pasan las pruebas
 - [ ] Elige tu rol (P1–P5) y tu primera tarea
-- [ ] Crea una rama por tarea (`feat/t05-miner`, por ejemplo) y abre un PR a `main`
+- [ ] Trabaja directo en `main`, sin ramas ni PR: `git pull --rebase --autostash` antes de cambiar algo, y commit más `git push` después (ver `CLAUDE.md`)
 - [ ] Programa contra los ejemplos de `contracts/fixtures/`; si necesitas cambiar un formato, avisa al equipo primero (los schemas rechazan campos desconocidos)
-- [ ] Un commit por tarea, con mensajes tipo `feat(miner): ...`, y marca la tarea en `odd/tasks/agentchaincut.md`
+- [ ] Commits tipo `feat(miner): ...` que terminan con `Status: pending | in-progress | done`, y marca la tarea en `odd/tasks/agentchaincut.md`
 
 | Riesgo | Cómo lo evitamos |
 | --- | --- |
