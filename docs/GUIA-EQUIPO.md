@@ -11,9 +11,12 @@
 
 ## 1. Qué es esto
 
-Vamos a construir **AgentChainCut**: una herramienta que le pone a cada asistente de IA de una empresa
-los permisos justos para hacer su trabajo, y demuestra que con esos permisos no se pueden robar datos
-y el trabajo normal sigue funcionando.
+**AgentChainCut: el mínimo privilegio para agentes de IA, calculado y probado antes de encenderlos.**
+
+Es una herramienta para el equipo de plataforma o de seguridad que está por conectar un agente de IA
+a sus herramientas. Responde su pregunta: *"¿qué es lo mínimo que necesita este agente, y cómo
+pruebo que con eso no puede filtrar datos?"*. Calcula los permisos justos, demuestra que con ellos
+no se pueden sacar datos y que el trabajo normal sigue funcionando, y los hace cumplir.
 
 | Dato | Valor |
 | --- | --- |
@@ -28,11 +31,29 @@ y el trabajo normal sigue funcionando.
 **La frase para recordar:** los demás equipos construyen guardias más inteligentes; nosotros
 construimos mejores cerraduras y probamos que encajan.
 
-## 2. El problema en una imagen
+## 2. El problema: ya pasó, y se arregló a mano
 
-Las empresas conectan asistentes de IA ("agentes") a sus sistemas con permisos que alcanzan a
-*todos* los clientes, aunque cada conversación sea sobre *un solo* cliente. Un atacante escribe un
-ticket con una orden escondida:
+Las plataformas empresariales de agentes les dan permisos de toda la organización o de todo el
+usuario mientras leen contenido no confiable. Cada vez que se descubrió, se arregló a mano, caso por
+caso y después del problema:
+
+| Caso | Qué pasó | Cómo se arregló |
+| --- | --- | --- |
+| Salesforce Agentforce "ForcedLeak" (Noma Security, sep. 2025, CVSS 9.4) | Instrucciones escondidas en un formulario Web-to-Lead hicieron que el agente sacara datos del CRM | Salesforce impuso una lista de URLs confiables mantenida a mano ([fuente](https://thehackernews.com/2025/09/salesforce-patches-critical-forcedleak.html)) |
+| ServiceNow Now Assist (AppOmni, nov. 2025) | Con la configuración por defecto, un texto plantado hizo que los agentes copiaran o sacaran datos y modificaran registros con los privilegios del usuario que inició la interacción | Ajustes de configuración manuales recomendados después ([fuente](https://thehackernews.com/2025/11/servicenow-ai-agents-can-be-tricked.html)) |
+| GitHub MCP (Invariant Labs, may. 2025) | Un issue público hizo que el agente leyera repos privados y los filtrara en un PR de un repo público | Recomendaciones de restringir a mano a qué repos accede el agente ([fuente](https://invariantlabs.ai/blog/mcp-github-vulnerability)) |
+
+¿Por qué una herramienta y no configuración a mano? Por la misma razón por la que en la nube existen
+generadores de políticas de mínimo privilegio a partir del uso observado (por ejemplo, la generación
+de políticas de AWS IAM Access Analyzer): las personas no escriben bien el mínimo privilegio a mano.
+Con agentes es más difícil: el permiso correcto depende de la sesión (este ticket, este repo, este
+cliente), los valores por defecto de las plataformas son amplios, y hay que probar que el recorte no
+rompe el trabajo.
+
+### Nuestro ejemplo: el agente de soporte
+
+Un agente de soporte tiene permisos que alcanzan a *todos* los clientes, aunque cada conversación
+sea sobre *un solo* cliente. Un atacante escribe un ticket con una orden escondida:
 
 ```mermaid
 flowchart LR
@@ -45,8 +66,9 @@ flowchart LR
 ```
 
 **Nada fue hackeado:** el agente usó permisos que ya tenía. Por eso no basta con hacer la IA "más
-lista": los atacantes siempre escriben trampas mejores. Esto ya pasó en casos reales (Supabase y
-GitHub en 2025).
+lista": los atacantes siempre escriben trampas mejores. Medido con agentes Claude reales y un ticket
+educado con trampa: sin proxy, leyeron la factura de otro cliente en **45/46** corridas; con el
+proxy, **0/114** corridas revelaron datos ajenos o hicieron un reembolso ajeno.
 
 ## 3. La idea: la tarjeta del hotel
 
@@ -81,6 +103,47 @@ flowchart TB
 ```
 
 El agente y su trabajo son los mismos; lo único que cambia es hasta dónde puede llegar.
+
+### ¿Reglas por sesión o permisos fijos?
+
+La política se calcula **una sola vez** (antes de encender el agente), pero sus reglas son
+**relaciones formales** que el proxy evalúa contra el contexto confiable de **cada sesión**, por
+ejemplo `github.create_pr.repo == task.repo` o `mail.send.to == ticket.customer.email`. No son reglas
+en lenguaje natural ni una IA decidiendo en el momento; las personas solo ven una explicación en
+lenguaje natural.
+
+Ejemplo con el caso de GitHub: la tarea es arreglar un issue del repo público A, y el agente también
+tiene acceso al repo privado B.
+
+| Acción del agente engañado | Permisos mínimos fijos | Regla por sesión: "solo el repo de esta tarea" |
+| --- | --- | --- |
+| Leer el issue de A | Permitido | Permitido |
+| Leer el código privado de B | Permitido (el agente necesita leer repos) | Bloqueado: `repo != task.repo` |
+| Publicar un PR en A con el contenido de B | Permitido (el agente necesita abrir PRs) | Bloqueado: no hay datos de B que publicar |
+
+```mermaid
+flowchart LR
+  I["Issue público en repo A<br/>con orden escondida"] --> AG["Agente"]
+  AG --> RB{"¿Leer repo privado B?<br/>regla: repo == task.repo"}
+  RB -- "permisos fijos: sí" --> PR["PR público en A<br/>con datos de B"]
+  RB -- "regla por sesión: no" --> OK["Bloqueado<br/>la tarea en A sigue funcionando"]
+  classDef bad fill:#fbebeb,stroke:#d14343,stroke-width:2px,color:#111
+  classDef good fill:#e5f4e4,stroke:#2f8f3a,stroke-width:2px,color:#111
+  class PR bad
+  class OK good
+```
+
+La evidencia: en nuestro banco de pruebas entre clientes, la lista fija de permisos (estilo Progent
+manual) dejó pasar el **58,3 %** de los ataques (175/300); nuestras reglas por sesión, el 0 % sin
+romper trabajo legítimo (200/200).
+
+### Límites que decimos
+
+- **ForcedLeak** sacó los datos por una URL de imagen en la *respuesta* del modelo, no por una
+  llamada a una herramienta. Nuestro proxy, tal como está, no lo habría detenido. Lo usamos para
+  mostrar el problema (rompe la Regla de Dos), no para decir "lo habríamos bloqueado".
+- Consultas SQL libres (el caso de Supabase): no cubiertas.
+- Bugs del propio servidor: fuera de alcance.
 
 ## 4. Cómo funciona
 
@@ -237,7 +300,7 @@ flowchart TB
 | P4 Optimizador | por asignar | T07, T10, T11 |
 | P5 Producto | por asignar | T13, T14, T16, T17 |
 
-Las tareas T01–T17 están descritas en [`odd/tasks/agentchaincut.md`](../odd/tasks/agentchaincut.md).
+Las tareas T01–T18 están descritas en [`odd/tasks/agentchaincut.md`](../odd/tasks/agentchaincut.md).
 
 ## 11. Cómo empezar hoy
 

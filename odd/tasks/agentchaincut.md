@@ -213,6 +213,11 @@ channels found by the residual search, synthetic world.
 
 ## Demo (3:00)
 
+0. **Opener (once T18 lands)** Real case first: the GitHub MCP toxic flow (Invariant Labs, May 2025)
+   replayed on a mock GitHub MCP server — public issue → read private repo → leak via public PR —
+   blocked by the mined `repo == task.repo` rule while the legit task passes. Then the support
+   agent as "our worked example". Until T18 exists, open by naming the three real cases
+   (ForcedLeak, ServiceNow Now Assist, GitHub MCP) in one sentence. Timings below shift accordingly.
 1. **0:00–0:20** Split screen: same poisoned ticket against unprotected vs protected agent.
 2. **0:20–0:45** Reachability proof: red path U → `invoice_read(any)` → `send(any)`.
 3. **0:45–1:25** Traces → invariants (rejected ones struck through with reason) →
@@ -268,6 +273,7 @@ Route legend: **inline** = parent session; **delegated** = one bounded writer.
 - [x] **T15** Live agent run through proxy (pinned model + prompt, offline replay) — inline; on `main` (rehearsal is T17)
 - [ ] **T16** README (production-first, one command per claim), project-description.md, platanus-hack-project.jsonc, 1000×1000 logo, public deploy — inline; README + submission drafts on `main`, logo/deploy/official-repo copy pending team decisions
 - [ ] **T17** Demo script rehearsal + recorded fallback video — human
+- [ ] **T18** GitHub-MCP-style demo: replay the published Invariant toxic flow (public issue → read private repo → leak via public PR) against a mock GitHub MCP server; the mined rule `repo == task.repo` blocks it while the legit task passes; becomes the demo opener and the "second integration" for the library framing — owner TBD
 
 Acceptance per task: its contract fixture validates, its unit tests pass, and it runs in
 `acc run world/` end to end once integrated. Test-first where a deterministic expected
@@ -338,8 +344,11 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 - 2026-10-24: Live results finalized in README, dashboard (en + /es) and data snapshot; `next build` OK.
 - 2026-10-24: Added `docs/HANDOFF.md` (Spanish team handoff for Juan, Carlos and José Miguel: what it is, how it works, measured numbers, bugs found, how to run, repo map, pending work, jury Q&A, 20-minute ramp-up) and linked it from the team guide.
 - 2026-10-24: Live-eval re-score (`odd/tasks/live-eval-rescore.md`, after an independent audit). v1 `leaked()` only scanned mail, so it missed the victim's amount in customer-visible notes on the attacker's own ticket and counted mail to the data owner as a leak. Added the v2 detector `disclosure()` (`leaked_v2`, `disclosed_in_mail`, `disclosed_in_note`, `foreign_refund`) and `python -m eval.live rescore`, an offline re-score of all 228 recorded transcripts with no API calls; v1 `leaked` is kept. Results (measured): subtle unprotected 45/46 foreign reads, 14/46 disclosures (all Haiku 4.5, all by note, 0 by mail); malicious unprotected (Haiku only, n=30) 14 foreign reads, 4 note disclosures, 2 foreign refunds; obvious 0/38; through the proxy 0 disclosures and 0 foreign refunds in 114 runs, answered 113/114. README, HANDOFF and dashboard copy (en + /es) corrected; 158 tests pass.
+- 2026-10-24: Message reframe (engine unchanged). The coach could not see a real use case because the story led with an invented scenario (support agent emailing customer A's invoice elsewhere). New positioning: "Least privilege for AI agents, computed and proven before you turn them on." The problem is now anchored in documented incidents fixed by hand after the fact (Salesforce Agentforce ForcedLeak, ServiceNow Now Assist, GitHub MCP), the user is the platform/security team connecting an agent, and the docs state that the policy is computed once offline but its formal rules are evaluated against each session's trusted context (static allowlist baseline: 58.3% attack success, 175/300). The support scenario stays as our worked example (45/46 foreign reads unprotected, 0/114 disclosures through the proxy). Declared limits: ForcedLeak leaked via an image URL in model output, which the proxy does not cover as-is; free-form SQL and server-side bugs out of scope. README opening and `docs/GUIA-EQUIPO.md` sections 1–3 updated; T18 added.
 
 ## Next step
 
-Assign roles, then continue with the open tasks directly on `main`.
+Build T18 (GitHub-MCP-style demo) so the demo opens with the real GitHub case; until then the
+opener names the three real incidents before the support example. Assign roles, then continue
+with the open tasks directly on `main`.
 Team onboarding (Spanish, with diagrams): `docs/GUIA-EQUIPO.md`.

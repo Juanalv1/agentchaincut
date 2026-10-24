@@ -1,15 +1,46 @@
 # AgentChainCut
 
-Compute and prove least-privilege policies for MCP-connected AI agents, then enforce them in a
-proxy that holds the credentials.
+**Least privilege for AI agents, computed and proven before you turn them on.**
 
-Support agents run with credentials that reach every customer, while each session is about one
-customer. A poisoned ticket makes the agent read another customer's invoice and email it out —
-nothing is hacked, the agent uses permissions it already had. AgentChainCut mines the rules that
-legitimate work always follows (`mail.send.to == ticket.customer.email`,
-`invoice_id ∈ customer.invoice_ids`), picks the narrowest policy with a CP-SAT solver under
-Meta's Agents Rule of Two, verifies it on unseen customers and attacks, and enforces it in an MCP
-proxy with a hash-chained decision ledger.
+## Why this matters
+
+Enterprise agent platforms give agents org-wide or user-wide permissions while they read
+untrusted content. Each time this was found, it was fixed by hand, one case at a time, after the fact:
+
+- **Salesforce Agentforce "ForcedLeak"** (Noma Security, Sep 2025, CVSS 9.4): hidden instructions
+  in a Web-to-Lead form made the agent exfiltrate CRM data; the fix was a hand-maintained Trusted
+  URL allowlist. [source](https://thehackernews.com/2025/09/salesforce-patches-critical-forcedleak.html)
+- **ServiceNow Now Assist** (AppOmni, Nov 2025): with default settings, planted text made agents
+  copy data and modify records with the privileges of the user who started the interaction.
+  [source](https://thehackernews.com/2025/11/servicenow-ai-agents-can-be-tricked.html)
+- **GitHub MCP** (Invariant Labs, May 2025): a public issue made the agent read private repos and
+  leak them through a PR in a public repo. [source](https://invariantlabs.ai/blog/mcp-github-vulnerability)
+
+The user is the platform or security team about to connect an agent to its tools, asking: *what
+is the minimum this agent needs, and how do I prove it cannot leak with that?* People do not
+write least privilege correctly by hand — that is why cloud IAM ships policy generators from
+observed usage (e.g. AWS IAM Access Analyzer). Agents are harder: the right permission depends on
+the session (this ticket, this repo, this customer), platform defaults are broad, and you must
+prove the cut does not break real work.
+
+AgentChainCut computes the policy **once, offline**, from traces of legitimate work: it mines
+formal relations that legitimate work always follows (`github.create_pr.repo == task.repo`,
+`mail.send.to == ticket.customer.email`, `invoice_id ∈ customer.invoice_ids`), picks the
+narrowest policy with a CP-SAT solver under Meta's Agents Rule of Two, and verifies it on unseen
+sessions and attacks. A credential-holding MCP proxy then evaluates those rules against **each
+session's trusted context** and writes every decision to a hash-chained ledger. The rules are not
+natural language and no LLM decides at runtime; humans only see a natural-language explanation.
+Fixed "minimum permission" lists are not enough: a static allowlist let **58.3%** of attacks
+through in our cross-tenant benchmark (175/300).
+
+Our worked example is a support agent: a polite poisoned ticket made live Claude agents read
+another customer's invoice in **45/46** unprotected runs; through the proxy, **0/114** runs
+disclosed foreign data or refunded a foreign invoice (details below).
+
+Honest limits: ForcedLeak exfiltrated through an image URL in the model's *output*, not a tool
+call, so this proxy as-is would not have stopped it — we cite it to show the problem (it breaks
+the Rule of Two), not as a block we claim. Free-form SQL arguments (the Supabase MCP case) and
+server-side bugs are out of scope.
 
 ## What runs today (one command per claim)
 
@@ -74,7 +105,7 @@ Declared limits: free-form SQL arguments, server-side bugs, the residual channel
 | `api/` | FastAPI service |
 | `web/` | Next.js + React Flow dashboard |
 | `docs/GUIA-EQUIPO.md` | team onboarding (Spanish) |
-| `odd/tasks/agentchaincut.md` | design, contracts, tasks T01–T17 and the work log |
+| `odd/tasks/agentchaincut.md` | design, contracts, tasks T01–T18 and the work log |
 
 ## Workflow
 
