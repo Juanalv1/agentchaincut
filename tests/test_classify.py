@@ -34,7 +34,7 @@ def test_discovered_catalog_validates_and_lists_every_tool() -> None:
     catalog = _catalog()
     contracts.validate("catalog", catalog)
     assert [t["tool"] for t in catalog] == [
-        "tickets.get", "tickets.add_note", "billing.invoice_read",
+        "tickets.get", "tickets.add_note", "billing.invoice_read", "billing.invoice_list",
         "billing.invoice_list_all", "billing.refund", "mail.send",
     ]
 
@@ -44,6 +44,7 @@ def test_legs_from_mcp_hints_and_heuristics() -> None:
     assert legs["tickets.get"] == {"U": True, "S": False, "X": False}
     assert legs["billing.invoice_read"] == {"U": False, "S": True, "X": False}
     assert legs["billing.invoice_list_all"] == {"U": False, "S": True, "X": False}
+    assert legs["billing.invoice_list"] == {"U": False, "S": True, "X": False}
     assert legs["billing.refund"] == {"U": False, "S": False, "X": True}
     assert legs["mail.send"] == {"U": False, "S": False, "X": True}
     assert legs["tickets.add_note"] == {"U": False, "S": False, "X": True}

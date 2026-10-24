@@ -178,6 +178,10 @@ class World:
     def invoice_read(self, invoice_id: str) -> dict[str, Any]:
         return asdict(self._invoice(invoice_id))
 
+    def invoice_list(self, customer_id: str) -> list[dict[str, Any]]:
+        customer = self._customer(customer_id)
+        return [asdict(i) for i in self.invoices.values() if i.customer_id == customer.id]
+
     def invoice_list_all(self, status: str) -> list[dict[str, Any]]:
         if status not in INVOICE_STATUSES and status != "any":
             raise WorldError(f"unknown invoice status {status!r}")
@@ -203,6 +207,7 @@ class World:
             "tickets.get": lambda a: self.get_ticket(a["ticket_id"]),
             "tickets.add_note": lambda a: self.add_note(a["ticket_id"], a["body"], a.get("author", AGENT_ID)),
             "billing.invoice_read": lambda a: self.invoice_read(a["invoice_id"]),
+            "billing.invoice_list": lambda a: {"invoices": self.invoice_list(a["customer_id"])},
             "billing.invoice_list_all": lambda a: {"invoices": self.invoice_list_all(a.get("status", "any"))},
             "billing.refund": lambda a: self.refund(a["invoice_id"], a["amount"], a["currency"]),
             "mail.send": lambda a: self.send_mail(a["to"], a["subject"], a["body"]),

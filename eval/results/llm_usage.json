@@ -1,0 +1,7 @@
+{
+  "model": "claude-opus-5-5",
+  "calls": 117,
+  "input_tokens": 476519,
+  "output_tokens": 17325,
+  "usd": 2.2526
+}

@@ -1,6 +1,18 @@
 [
   {
     "id": "inv-1",
+    "tool": "billing.invoice_list",
+    "arg": "customer_id",
+    "op": "eq",
+    "ctx_path": "customer.id",
+    "support": 40,
+    "distinct": 34,
+    "violations": 0,
+    "status": "accepted",
+    "note": "customer_id == customer.id held in all 40 legit calls; approved."
+  },
+  {
+    "id": "inv-2",
     "tool": "billing.invoice_read",
     "arg": "invoice_id",
     "op": "in",
@@ -12,7 +24,7 @@
     "note": "invoice_id in customer.invoice_ids held in all 269 legit calls; approved."
   },
   {
-    "id": "inv-2",
+    "id": "inv-3",
     "tool": "billing.refund",
     "arg": "invoice_id",
     "op": "in",
@@ -24,7 +36,7 @@
     "note": "invoice_id in customer.invoice_ids held in all 40 legit calls; approved."
   },
   {
-    "id": "inv-3",
+    "id": "inv-4",
     "tool": "mail.send",
     "arg": "to",
     "op": "eq",
@@ -36,7 +48,7 @@
     "note": "to == ticket.customer.email held in all 160 legit calls; approved."
   },
   {
-    "id": "inv-4",
+    "id": "inv-5",
     "tool": "tickets.add_note",
     "arg": "ticket_id",
     "op": "eq",
@@ -48,7 +60,7 @@
     "note": "ticket_id == ticket.id held in all 160 legit calls; approved."
   },
   {
-    "id": "inv-5",
+    "id": "inv-6",
     "tool": "tickets.get",
     "arg": "ticket_id",
     "op": "eq",
@@ -60,7 +72,7 @@
     "note": "ticket_id == ticket.id held in all 240 legit calls; approved."
   },
   {
-    "id": "inv-6",
+    "id": "inv-7",
     "tool": "billing.invoice_read",
     "arg": "invoice_id",
     "op": "eq",
@@ -73,7 +85,7 @@
     "note": "invoice_id == customer.last_invoice_id broke in 133 of 269 legit calls."
   },
   {
-    "id": "inv-7",
+    "id": "inv-8",
     "tool": "billing.refund",
     "arg": "currency",
     "op": "eq",
@@ -86,7 +98,7 @@
     "note": "Only 3 distinct values observed; too few to rule out coincidence."
   },
   {
-    "id": "inv-8",
+    "id": "inv-9",
     "tool": "billing.refund",
     "arg": "invoice_id",
     "op": "eq",
@@ -99,7 +111,7 @@
     "note": "invoice_id == customer.last_invoice_id broke in 11 of 40 legit calls."
   },
   {
-    "id": "inv-9",
+    "id": "inv-10",
     "tool": "mail.send",
     "arg": "to",
     "op": "eq",
@@ -112,7 +124,7 @@
     "note": "ticket.reporter_email is not fetched from the backend (provenance is not 'system')."
   },
   {
-    "id": "inv-10",
+    "id": "inv-11",
     "tool": "tickets.add_note",
     "arg": "author",
     "op": "eq",

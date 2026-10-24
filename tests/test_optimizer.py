@@ -48,6 +48,7 @@ def test_least_privilege_modes() -> None:
         "tickets.get": "scoped",
         "tickets.add_note": "scoped",
         "billing.invoice_read": "scoped",
+        "billing.invoice_list": "scoped",
         "billing.invoice_list_all": "deny",
         "billing.refund": "approval",
         "mail.send": "scoped",
@@ -75,7 +76,7 @@ def test_rule_of_two_conflict_is_reported_with_minimal_core_and_fixes() -> None:
     assert fixes["approval_edge"]["tool"] == "billing.refund"
     assert fixes["split_agent"]["partition"] == [
         ["tickets.get", "tickets.add_note", "mail.send"],
-        ["billing.invoice_read", "billing.refund"],
+        ["billing.invoice_read", "billing.invoice_list", "billing.refund"],
     ]
     assert conflict["resolved_by"] == "approval_edge"
     assert policy["legs_per_session"] == {"U": True, "S": True, "X": "bounded"}

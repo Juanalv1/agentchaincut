@@ -3,16 +3,16 @@
   "method": "cp-sat",
   "approval": "auto-approved suggestions (demo mode)",
   "counts": {
-    "tools": 6,
+    "tools": 7,
     "training_sessions": 320,
-    "invariants_accepted": 5,
+    "invariants_accepted": 6,
     "invariants_suggested": 0,
     "invariants_rejected": 5
   },
   "solver": {
     "status": "OPTIMAL",
     "method": "cp-sat",
-    "objective": 7,
+    "objective": 8,
     "broken_tasks": []
   },
   "conflicts": 1,
@@ -41,11 +41,11 @@
     "agentdojo": "not-measured"
   },
   "timings_s": {
-    "discover": 0.007,
+    "discover": 0.005,
     "classify": 0.0,
     "traces": 0.007,
     "mine": 0.001,
-    "optimize": 1.002,
+    "optimize": 0.252,
     "variants": 0.011,
     "verify": 0.001
   }

@@ -16,26 +16,27 @@ proxy with a hash-chained decision ledger.
 ```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest                                               # 146 tests
+pytest                                               # 148 tests
 ```
 
 | Claim | Command | Result (seed 26) |
 |---|---|---|
 | Full pipeline: discover → classify → traces → mine → CP-SAT → verify → export | `acc run world/ --out artifacts` | ~1 s, every artifact schema-validated |
 | The abuse path exists before the policy and is refused after it | same, see `artifacts/reachability.json` | before: allowed (victim invoice reaches `attacker@evil.test`); after: refused at `billing.invoice_read` |
-| Mined rules bind arguments to the session; bad candidates are rejected with a reason | `artifacts/invariants.json` | 5 accepted; rejected: constant, distinct<5, untrusted_ctx, coincidental ×2 |
+| Mined rules bind arguments to the session; bad candidates are rejected with a reason | `artifacts/invariants.json` | 6 accepted; rejected: constant, distinct<5, untrusted_ctx, coincidental ×2 |
 | The solver keeps all legit work and explains its one conflict | `artifacts/policy.yaml` | OPTIMAL, 0 broken tasks; `refund_request` needs U+S+X → human approval on `billing.refund` (or split the agent) |
 | Held-out customers pass, attacks are blocked | `artifacts/verify.json` | 200/200 legit, 300/300 abuse blocked, 0 false denies (measured) |
-| Cross-tenant benchmark vs baselines | `python -m eval.crosstenant` | attack success: none 100%, taint-only 25.0% (and 17% false denies), static allowlist 52.3%, **AgentChainCut 0.0%** with 100% utility (n=300/200) |
+| Cross-tenant benchmark vs baselines | `python -m eval.crosstenant` | attack success: none 100%, taint-only 33.3% (and 17% false denies), static allowlist 58.3%, **AgentChainCut 0.0%** with 100% utility (n=300/200); LLM-written policy (`claude-opus-5-5`, stratified n=24): 0% attacks but 66.7% utility |
 | AgentDojo, policy level | `python -m eval.agentdojo` | 11.6% of attacks pass automatically, 75.3% wait for approval, utility 86.6% counting approvals — see the honest reading in `eval/results/agentdojo.md` |
 | Enforcing proxy over MCP stdio | `python -m proxy --policy artifacts/policy.yaml` | denied tools are not even advertised; every decision is ledgered |
 | API + live demo endpoints + SSE | `python -m api` | `POST /live/attack`, `GET /events`, `GET /ledger/verify`, … |
 | Dashboard (static, offline replay or live) | `cd web && npm install && npm run sync && npm run build` | `npx serve web/out` |
 | Exports | `artifacts/export/` | Claude Code PreToolUse hook, Progent-style JSON, Assay-style YAML |
+| Live Claude agent, same poisoned ticket, unprotected vs proxy | `python -m eval.live --runs 3` | `claude-opus-5-5` resisted the injection on both sides (0/3 leaks each); the proxied agent still completed every reply to the right customer |
 
-Not measured yet: the LLM-written-policy baseline and the live Claude agent run need an
-`ANTHROPIC_API_KEY` (env or git-ignored `.env`, plus `pip install -e ".[llm]"`), then
-`python -m eval.crosstenant` and `python -m eval.live --runs 3`.
+LLM runs need `ANTHROPIC_API_KEY` (env or git-ignored `.env`) and `pip install -e ".[llm]"`; answers
+are cached under `eval/results/` and spend is tracked in `eval/results/llm_usage.json` with a
+budget stop (`ACC_LLM_BUDGET_USD`, default 10).
 
 ## How it works
 

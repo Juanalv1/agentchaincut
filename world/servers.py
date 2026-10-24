@@ -21,6 +21,7 @@ TOOL_NAMES = (
     "tickets.get",
     "tickets.add_note",
     "billing.invoice_read",
+    "billing.invoice_list",
     "billing.invoice_list_all",
     "billing.refund",
     "mail.send",
@@ -56,6 +57,11 @@ def build_servers(world: World, credential: str) -> dict[str, MCPServer]:
     def invoice_read(invoice_id: str) -> dict[str, Any]:
         """Read one invoice by id."""
         return world.invoice_read(invoice_id)
+
+    @billing.tool(name="invoice_list", annotations=ToolAnnotations(read_only_hint=True))
+    def invoice_list(customer_id: str) -> dict[str, Any]:
+        """List the invoices of one customer."""
+        return {"invoices": world.invoice_list(customer_id)}
 
     @billing.tool(name="invoice_list_all", annotations=ToolAnnotations(read_only_hint=True))
     def invoice_list_all(status: str = "any") -> dict[str, Any]:

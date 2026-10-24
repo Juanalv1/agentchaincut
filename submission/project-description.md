@@ -19,9 +19,10 @@ Un agente de soporte lee tickets, consulta facturas y manda correos con una cred
 | Defensa | Ataques que pasan | Trabajo legítimo que sigue |
 |---|---|---|
 | Sin defensa | 100% (300/300) | 100% (200/200) |
-| Solo taint (estilo Ikarus) | 25,0% (75/300) | 83,0% (166/200) |
-| Allowlist estática (estilo Progent manual) | 52,3% (157/300) | 100% (200/200) |
+| Solo taint (estilo Ikarus) | 33,3% (100/300) | 83,0% (166/200) |
+| Allowlist estática (estilo Progent manual) | 58,3% (175/300) | 100% (200/200) |
 | **AgentChainCut** | **0,0% (0/300)** | **100% (200/200)** |
+| Política escrita por un LLM (muestra n=24) | 0% (0/12) | 66,7% (8/12) |
 
 En AgentDojo, a nivel de política y sin LLM, pasa el 11,6% de los ataques y el 75,3% queda en aprobación humana. Ahí no hay contexto confiable de sesión, y lo decimos tal cual.
 

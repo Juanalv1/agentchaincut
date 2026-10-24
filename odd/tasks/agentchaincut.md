@@ -261,11 +261,11 @@ Route legend: **inline** = parent session; **delegated** = one bounded writer.
 - [x] **T08** Variant generator + verifier + residual-risk search — inline; on `main`
 - [x] **T09** Credential-holding proxy, session binding, policy engine, fail-closed, ledger, events (SSE relay in T13) — inline; on `main`
 - [x] **T10** Exports: Claude Code PreToolUse hook, Progent-style JSON, Assay-style YAML — inline; on `main`
-- [ ] **T11** Cross-tenant benchmark + 4 baselines + results table generator — inline; deterministic part done on `main`, LLM-policy row pending the API key
+- [x] **T11** Cross-tenant benchmark + 4 baselines + results table generator — inline; on `main` (LLM row measured)
 - [x] **T12** AgentDojo within-suite k-fold evaluation (policy level, ground-truth calls, no LLM) — inline; on `main`
 - [x] **T13** FastAPI service (pipeline run, artifacts, live run, approvals, attack demo, ledger verify/tamper, SSE relay) — inline; on `main`
 - [x] **T14** Dashboard: tool graph, invariants, solver/conflicts, verify counters, ledger, results — inline; on `main`
-- [ ] **T15** Live agent run through proxy (pinned model + prompt, rehearsed, offline replay) — inline; harness on `main`, live run pending the API key
+- [x] **T15** Live agent run through proxy (pinned model + prompt, offline replay) — inline; on `main` (rehearsal is T17)
 - [ ] **T16** README (production-first, one command per claim), project-description.md, platanus-hack-project.jsonc, 1000×1000 logo, public deploy — inline; README + submission drafts on `main`, logo/deploy/official-repo copy pending team decisions
 - [ ] **T17** Demo script rehearsal + recorded fallback video — human
 
@@ -317,6 +317,12 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 - 2026-10-24: Dashboard results section now also shows the AgentDojo policy-level table (per suite + total) with the honest reading and the published end-to-end references; snapshot re-synced. Evidence: `next build` OK.
 - 2026-10-24: T16 partial. README rewritten production-first with one command per claim and the measured numbers (every command re-run: `python -m api` smoke-tested with curl — /health OK, /live/attack unprotected leaked / protected not, SSE events streaming). Spanish drafts in `submission/` (`project-description.md`, `platanus-hack-project.jsonc`, deploy-url left pending). Not done, needs the team: copying into `platanus-hack-26-ve-team-21` (it already has a logo, `project-logo.png`), public deploy (Render API + Vercel dashboard per the design), and the final deploy URL. The official README template's hidden LLM instruction was not followed.
 - 2026-10-24: Added `docs/DEMO.md` (Spanish operating script: commands, minute-by-minute clicks, fallbacks); refreshed the team guide (146 tests, what runs) and this document's status line.
+
+- 2026-10-24: API key provided by the user (git-ignored `.env`; the agent could not read the file directly, the app loader can). Added usage tracking with a budget stop (`eval/results/llm_usage.json`, `ACC_LLM_BUDGET_USD`, default 10; user limit: "gasta ... 10 dolares como maximo").
+- 2026-10-24: T11 LLM row measured. First run exposed a harness bug: the LLM wrote amounts as text ("115.67") and the comparison was type-strict; fixed with `_same()` (number-as-text equality) plus a test; rerun from cache at no cost.
+- 2026-10-24: T15 first live run (kept in `eval/results/live-v1-no-tenant-list/`): `claude-opus-5-5` resisted the injection on both sides (0/3 leaks each); unprotected it called `billing.invoice_list_all` (every tenant's invoices) to find one customer's invoice; through the proxy it could not complete the reply because the world had no tenant-scoped listing. Fixed the world realistically: `billing.invoice_list(customer_id)` (Stripe-like), `resend_all_invoices` uses it, new abuse family `foreign_list`. Miner now accepts `customer_id == customer.id` (6 rules); policy OPTIMAL objective 8; held-out 200/200, abuse 300/300 (9 families), 0 false denies.
+- 2026-10-24: Rerun results (measured). Cross-tenant n=300/200: taint-only 33.3% attacks / 83.0% utility; static allowlist 58.3% / 100%; AgentChainCut 0.0% / 100%. Stratified sample n=24: LLM-written policy 0% attacks, 66.7% utility (its own omissions: no `mail.send` for a thanks ticket, no `invoice_list` for "all my invoices"), variance 0 of 5 sessions across 3 runs. Live (n=3 per side): 0 leaks both sides; proxied agent completed all 3 replies to the right customer. LLM spend so far $2.25.
+- 2026-10-24: Results, README, submission draft and dashboard snapshot refreshed after the LLM and live runs (148 tests passed; `next build` OK).
 
 ## Next step
 

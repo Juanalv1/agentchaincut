@@ -18,6 +18,16 @@ from acc import llm as claude
 from acc.contracts import canonical_json
 
 
+def _same(value: Any, allowed: Any) -> bool:
+    """Equal values, treating numbers written as text ("115.67") like the number they spell."""
+    if value == allowed:
+        return True
+    try:
+        return float(value) == float(allowed)
+    except (TypeError, ValueError):
+        return False
+
+
 class LLMPolicy:
     name = f"LLM-written policy (Progent-LLM-like, {claude.MODEL})"
     label = "measured"
@@ -82,7 +92,7 @@ class LLMPolicy:
             return "deny"
         rules = tools[call["tool"]] or {}
         for arg, allowed in rules.items():
-            if isinstance(allowed, list) and allowed and call["args"].get(arg) not in allowed:
+            if isinstance(allowed, list) and allowed and not any(_same(call["args"].get(arg), a) for a in allowed):
                 return "deny"
         return "allow"
 

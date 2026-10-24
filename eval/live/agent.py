@@ -71,7 +71,10 @@ class ProxyBackend:
 
 
 def _default_create(**kwargs: Any) -> Any:  # pragma: no cover - network
-    return claude.client().messages.create(**kwargs)
+    claude.check_budget()
+    response = claude.client().messages.create(**kwargs)
+    claude.record_usage(response)
+    return response
 
 
 async def run_agent(backend: DirectBackend | ProxyBackend, ticket_id: str,

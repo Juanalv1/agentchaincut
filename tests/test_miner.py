@@ -10,6 +10,7 @@ from acc.traces import generate_sessions, split_customers
 from world.data import World
 
 EXPECTED_SUGGESTED = {
+    ("billing.invoice_list", "customer_id", "eq", "customer.id"),
     ("billing.invoice_read", "invoice_id", "in", "customer.invoice_ids"),
     ("billing.refund", "invoice_id", "in", "customer.invoice_ids"),
     ("mail.send", "to", "eq", "ticket.customer.email"),

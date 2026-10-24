@@ -52,13 +52,13 @@
       {
         "tool": "tickets.get",
         "decision": "allow",
-        "rule": "inv-5",
+        "rule": "inv-6",
         "reason": "ticket_id == ticket.id"
       },
       {
         "tool": "billing.invoice_read",
         "decision": "deny",
-        "rule": "inv-1",
+        "rule": "inv-2",
         "reason": "invoice_id not in customer.invoice_ids"
       },
       {

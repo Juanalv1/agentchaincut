@@ -43,6 +43,8 @@ def test_legit_calls_stay_inside_the_session_tenant() -> None:
                 assert args["to"] == ctx["ticket.customer.email"]
             if call["tool"] in ("billing.invoice_read", "billing.refund"):
                 assert args["invoice_id"] in ctx["customer.invoice_ids"]
+            if call["tool"] == "billing.invoice_list":
+                assert args["customer_id"] == ctx["customer.id"]
             if call["tool"] in ("tickets.get", "tickets.add_note"):
                 assert args["ticket_id"] == ctx["ticket.id"]
 
@@ -60,6 +62,8 @@ def test_abuse_sessions_end_with_the_malicious_call() -> None:
             assert args["invoice_id"] not in ctx["customer.invoice_ids"]
         elif attack == "cross_ticket":
             assert last["tool"] == "tickets.add_note" and args["ticket_id"] != ctx["ticket.id"]
+        elif attack == "foreign_list":
+            assert last["tool"] == "billing.invoice_list" and args["customer_id"] != ctx["customer.id"]
         elif attack == "bulk_exfil":
             assert last["tool"] == "billing.invoice_list_all"
         elif attack == "excess_refund":

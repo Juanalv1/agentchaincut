@@ -107,4 +107,18 @@ def test_stratified_sample_is_balanced_and_covers_every_kind() -> None:
     sample = stratified_sample(variants, 24)
     assert sum(s["label"] == "legit" for s in sample) == 12
     assert len({s["task_id"] for s in sample if s["label"] == "legit"}) == 6
-    assert len({s["attack"] for s in sample if s["label"] == "abuse"}) == 8
+    from acc.traces import ABUSE_FAMILIES
+
+    assert len({s["attack"] for s in sample if s["label"] == "abuse"}) == len(ABUSE_FAMILIES)
+
+
+def test_llm_policy_matches_numbers_written_as_text(tmp_path: Path) -> None:
+    *_, variants = _setup()
+    _, catalog, *_ = _setup()
+    refund = next(s for s in variants if s["label"] == "legit" and s["task_id"] == "refund_request")
+    call = next(c for c in refund["calls"] if c["tool"] == "billing.refund")
+    answer = {"tools": {c["tool"]: {} for c in refund["calls"]}}
+    answer["tools"]["billing.refund"] = {"amount": [str(call["args"]["amount"])]}
+    llm = LLMPolicy(catalog, tmp_path / "c.json", complete=lambda p: json.dumps(answer))
+    index = refund["calls"].index(call)
+    assert llm.decide(refund, index) == "allow"

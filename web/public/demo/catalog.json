@@ -78,6 +78,28 @@
     "rationale": "readOnlyHint=true; name refers to sensitive records"
   },
   {
+    "tool": "billing.invoice_list",
+    "server": "billing",
+    "description": "List the invoices of one customer.",
+    "args": [
+      {
+        "name": "customer_id",
+        "type": "string",
+        "role": "object_id"
+      }
+    ],
+    "legs": {
+      "U": false,
+      "S": true,
+      "X": false
+    },
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "source": "mcp_hint",
+    "rationale": "readOnlyHint=true; name refers to sensitive records"
+  },
+  {
     "tool": "billing.invoice_list_all",
     "server": "billing",
     "description": "List invoices across all customers.",

@@ -18,6 +18,11 @@ tools:
   when:
   - arg: invoice_id
     in_context: customer.invoice_ids
+- name: billing.invoice_list
+  decision: allow
+  when:
+  - arg: customer_id
+    equals_context: customer.id
 - name: billing.refund
   decision: ask
   when:

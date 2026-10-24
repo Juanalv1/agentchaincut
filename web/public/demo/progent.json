@@ -10,7 +10,7 @@
           "ticket_id": {
             "type": "string",
             "enum": [
-              "T-0331"
+              "T-0330"
             ]
           }
         },
@@ -25,7 +25,7 @@
           "ticket_id": {
             "type": "string",
             "enum": [
-              "T-0331"
+              "T-0330"
             ]
           }
         },
@@ -41,6 +41,21 @@
             "type": "string",
             "enum": [
               "I-0028"
+            ]
+          }
+        },
+        "fallback": 1
+      }
+    ],
+    "billing.invoice_list": [
+      {
+        "priority": 1,
+        "effect": 0,
+        "conditions": {
+          "customer_id": {
+            "type": "string",
+            "enum": [
+              "C-010"
             ]
           }
         },

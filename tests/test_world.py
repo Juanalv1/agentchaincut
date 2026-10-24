@@ -71,6 +71,14 @@ def test_send_mail_lands_in_outbox() -> None:
     assert world.outbox[-1] == {"to": "ana@acme.test", "subject": "Hi", "body": "Body"}
 
 
+def test_invoice_list_returns_only_that_customers_invoices() -> None:
+    world = World()
+    listed = world.invoice_list("C-004")
+    assert [i["id"] for i in listed] == world.invoice_ids_of("C-004")
+    with pytest.raises(WorldError):
+        world.invoice_list("C-999")
+
+
 def test_servers_require_the_service_credential() -> None:
     world = World()
     with pytest.raises(PermissionError):
