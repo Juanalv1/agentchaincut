@@ -241,7 +241,7 @@ Las tareas T01–T17 están descritas en [`odd/tasks/agentchaincut.md`](../odd/t
 
 ## 11. Cómo empezar hoy
 
-La base ya existe en `main`: esqueleto del repo, formatos de datos y ejemplos (T01, 49 pruebas pasando).
+En `main` ya corre el pipeline completo (`acc run world/`), el proxy, la API, el dashboard y las evaluaciones (146 pruebas pasando). Qué falta: ver `odd/tasks/agentchaincut.md`. Guion operativo de la demo: `docs/DEMO.md`.
 
 - [ ] Acepta la invitación de GitHub a `Juanalv1/agentchaincut`
 - [ ] Clona el repo, crea un entorno virtual e instala: `python -m venv .venv` y `pip install -e ".[dev]"`

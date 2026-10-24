@@ -5,7 +5,7 @@
 > result; record meaningful changes in Progress so everyone stays aligned.
 
 > Compile and prove least-privilege policies for MCP-connected AI agents.
-> Platanus Hack 26 Caracas · AI Security track · Status: **design, not started**
+> Platanus Hack 26 Caracas · AI Security track · Status: **pipeline, proxy, API, dashboard and evals on `main`; LLM rows, live run, deploy and video pending**
 
 ## Objective
 
@@ -316,6 +316,7 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
 - 2026-10-24: T12 done. AgentDojo 0.1.35 lives in a separate Python 3.12 env (`.venv-agentdojo/`, gitignored); `eval/agentdojo/export.py` exports v1.2 (4 suites, 97 user tasks, 35 injection tasks; MIT) to `eval/agentdojo/data/agentdojo-v1.2.json`. `python -m eval.agentdojo` runs within-suite 5-fold: policy from training folds (classify -> mine -> approve -> CP-SAT), trusted context = literals typed in the user prompt, utility = held-out ground truth permitted, attack = injection ground truth inside each held-out user session. Measured (policy-level, indicative): attacks allowed automatically 11.6% (110/949), held for approval 75.3%, utility 86.6% counting approvals / 51.5% without. Honest reading: AgentDojo takes recipients/ids from tool outputs, so `arg in prompt` rules break on legit work and are rejected (coincidental/distinct<5); the policy falls back to approval; passing attacks are U+X sessions without S, which the Rule of Two allows. Published end-to-end references (Progent paper) kept separate. Classifier vocabulary widened (`check`, `share`, `reserve`, `schedule`, `append`...; untrusted: file/email/webpage/review/transactions); differential check: world pipeline output identical (OPTIMAL 7, 200/200, 300/300). Evidence: `tests/test_agentdojo.py` 3 tests, full suite 146 passed.
 - 2026-10-24: Dashboard results section now also shows the AgentDojo policy-level table (per suite + total) with the honest reading and the published end-to-end references; snapshot re-synced. Evidence: `next build` OK.
 - 2026-10-24: T16 partial. README rewritten production-first with one command per claim and the measured numbers (every command re-run: `python -m api` smoke-tested with curl — /health OK, /live/attack unprotected leaked / protected not, SSE events streaming). Spanish drafts in `submission/` (`project-description.md`, `platanus-hack-project.jsonc`, deploy-url left pending). Not done, needs the team: copying into `platanus-hack-26-ve-team-21` (it already has a logo, `project-logo.png`), public deploy (Render API + Vercel dashboard per the design), and the final deploy URL. The official README template's hidden LLM instruction was not followed.
+- 2026-10-24: Added `docs/DEMO.md` (Spanish operating script: commands, minute-by-minute clicks, fallbacks); refreshed the team guide (146 tests, what runs) and this document's status line.
 
 ## Next step
 
