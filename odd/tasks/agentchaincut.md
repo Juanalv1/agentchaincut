@@ -274,6 +274,8 @@ Route legend: **inline** = parent session; **delegated** = one bounded writer.
 - [ ] **T16** README (production-first, one command per claim), project-description.md, platanus-hack-project.jsonc, 1000×1000 logo, public deploy — inline; README + submission drafts on `main`, logo/deploy/official-repo copy pending team decisions
 - [ ] **T17** Demo script rehearsal + recorded fallback video — human
 - [ ] **T18** GitHub-MCP-style demo: replay the published Invariant toxic flow (public issue → read private repo → leak via public PR) against a mock GitHub MCP server; the mined rule `repo == task.repo` blocks it while the legit task passes; becomes the demo opener and the "second integration" for the library framing — owner TBD
+      - **Must produce its own numbers** (the presentation tells one story, GitHub, end to end): run real Claude agents on the GitHub scenario without and with the proxy (same `eval.live` style: several models, n per cell, cached answers, budget stop) and report "X/N published the private repo without the proxy; 0/N with it; legit task completed Y/N". Until these exist, the deck shows the support-world numbers labeled as such.
+      - Mitigation context for the pitch (verified 2026-10-24 in github/github-mcp-server README): GitHub added an optional "lockdown mode" that filters content from users without push access, and documents it as "a best-effort content filter… not an authorization boundary" that "does not change what the underlying GitHub credential can read or write".
 
 Acceptance per task: its contract fixture validates, its unit tests pass, and it runs in
 `acc run world/` end to end once integrated. Test-first where a deterministic expected
