@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable
 
+from acc import llm as claude
 from acc.contracts import canonical_json
 
 READ_VERBS = {"get", "read", "list", "search", "fetch", "find", "lookup", "query", "show", "view"}
@@ -26,7 +27,7 @@ SENSITIVE_WORDS = {
 }
 UNTRUSTED_WORDS = {"ticket", "tickets", "message", "inbox", "web", "page", "comment", "issue", "review", "feedback"}
 
-LLM_MODEL = "claude-opus-5-5"
+LLM_MODEL = claude.MODEL
 _LEGS_SINK = {"U": False, "S": False, "X": True}
 
 
@@ -44,7 +45,7 @@ class LLMClassifier:
 
     def __init__(self, cache_path: str | Path, complete: Callable[[str], str] | None = None) -> None:
         self.cache_path = Path(cache_path)
-        self._complete = complete or _anthropic_complete
+        self._complete = complete or claude.complete
         self._cache: dict[str, Any] = (
             json.loads(self.cache_path.read_text(encoding="utf-8")) if self.cache_path.exists() else {}
         )
@@ -82,23 +83,6 @@ def _parse_llm(text: str) -> tuple[dict[str, bool], str] | None:
         return legs, f"LLM ({LLM_MODEL}, cached): {data.get('rationale', 'no rationale')}"
     except (ValueError, KeyError, TypeError, AttributeError):
         return None
-
-
-def _anthropic_complete(prompt: str) -> str:  # pragma: no cover - needs network and credentials
-    import anthropic  # optional dependency: pip install -e ".[llm]"
-
-    client = anthropic.Anthropic()
-    response = client.beta.messages.create(
-        model=LLM_MODEL,
-        max_tokens=1024,
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",
-        output_config={"effort": "low"},
-        messages=[{"role": "user", "content": prompt}],
-    )
-    if response.stop_reason == "refusal":
-        raise RuntimeError("classifier request refused")
-    return "".join(block.text for block in response.content if block.type == "text")
 
 
 def classify_tool(
