@@ -250,6 +250,6 @@ def test_skeleton_packages_import(module: str) -> None:
     assert importlib.import_module(module).__doc__
 
 
-def test_cli_run_is_not_implemented_yet(capsys: pytest.CaptureFixture[str]) -> None:
-    assert cli_main(["run", "world/"]) != 0
-    assert "not implemented" in capsys.readouterr().err
+def test_cli_run_rejects_a_missing_world_dir(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+    assert cli_main(["run", str(tmp_path / "nope"), "--out", str(tmp_path / "out")]) == 2
+    assert "world directory not found" in capsys.readouterr().err
