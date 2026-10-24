@@ -4,14 +4,33 @@
     {
       "name": "api",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "api", "--port", "8000"],
+      "runtimeArgs": [
+        "-m",
+        "api",
+        "--port",
+        "8000"
+      ],
       "port": 8000
     },
     {
       "name": "web",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "set NEXT_PUBLIC_API_URL=http://localhost:8001&& npm --prefix web run dev"],
+      "runtimeArgs": [
+        "/c",
+        "set NEXT_PUBLIC_API_URL=http://localhost:8001&& npm --prefix web run dev"
+      ],
       "port": 3000
+    },
+    {
+      "name": "api-live",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "api",
+        "--port",
+        "8001"
+      ],
+      "port": 8001
     }
   ]
 }
