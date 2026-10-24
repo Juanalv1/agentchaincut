@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToolGraph } from "@/components/ToolGraph";
+import { ArcPairs, Blocks, HeroScene, LogoPixels } from "@/components/Pixels";
 import { API_URL, api, loadSnapshot } from "@/lib/data";
 import { verifyChain } from "@/lib/ledger";
 import { COPY, type Copy, type Lang } from "@/lib/i18n";
 import type { Attack, BenchRow, LedgerEntry, Snapshot, Step } from "@/lib/types";
 
 const LIVE = API_URL !== "";
+/** Held-out customers in the verify split (not exported in the snapshot). */
+const HELDOUT_CUSTOMERS = 80;
 
 function pct(count: number, n: number): string {
   return n ? `${((100 * count) / n).toFixed(1)}%` : "n/a";
@@ -97,6 +100,10 @@ export function Dashboard({ lang }: { lang: Lang }) {
   const [tab, setTab] = useState<"hook" | "progent" | "assay">("hook");
 
   useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  useEffect(() => {
     loadSnapshot()
       .then((snap) => {
         setData(snap);
@@ -162,7 +169,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
   if (error) {
     return (
       <main className="wrap hero">
-        <h1>{t.snapshotMissing}</h1>
+        <h1 style={{ fontSize: 48 }}>{t.snapshotMissing}</h1>
         <p className="lede">{t.runSync} <code>npm run sync</code> {t.after} <code>acc run world/</code>. ({error})</p>
       </main>
     );
@@ -176,15 +183,24 @@ export function Dashboard({ lang }: { lang: Lang }) {
   const accepted = invariants.filter((i) => i.status !== "rejected");
   const rejected = invariants.filter((i) => i.status === "rejected");
   const progentJson = JSON.stringify(data.progent, null, 2);
+  const legitSessions = Math.max(0, ...accepted.map((i) => i.support));
+  const mailRule = accepted.find((i) => i.tool === "mail.send") ?? accepted[0];
+  const leakPct = verify.abuse.n ? Math.round((100 * (verify.abuse.n - verify.abuse.blocked)) / verify.abuse.n) : 0;
+  const cut = attack.ticket.indexOf("SYSTEM:");
+  const ticketSafe = cut >= 0 ? attack.ticket.slice(0, cut) : attack.ticket;
+  const ticketInjected = cut >= 0 ? attack.ticket.slice(cut) : "";
+  const oursRow = (name: string) => name === "AgentChainCut";
 
   return (
     <>
       <nav className="nav">
         <div className="wrap nav-inner">
-          <a className="wordmark" href="#top">AgentChainCut</a>
+          <a className="wordmark" href="#top"><LogoPixels />AGENTCHAINCUT</a>
           <div className="nav-links">
+            <a href="#attack">{t.nav.attack}</a>
+            <a href="#pattern">{t.nav.pattern}</a>
+            <a href="#proof">{t.nav.proof}</a>
             <a href="#map">{t.nav.map}</a>
-            <a href="#rules">{t.nav.rules}</a>
             <a href="#solver">{t.nav.solver}</a>
             <a href="#verify">{t.nav.verify}</a>
             <a href="#ledger">{t.nav.ledger}</a>
@@ -199,19 +215,30 @@ export function Dashboard({ lang }: { lang: Lang }) {
       <main id="top">
         <section className="hero">
           <div className="wrap">
-            <div className="hero-grid">
-              <div className="head">
-                <span className="label">{t.heroLabel}</span>
-                <h1>{t.heroTitle}</h1>
+            <p className="label">{t.heroLabel}</p>
+            <h1>{t.heroTitleA}<br /><span className="dim">{t.heroTitleB}</span></h1>
+            <p className="lede">{t.heroLede}</p>
+            <HeroScene t={t} />
+          </div>
+        </section>
+
+        <section id="attack">
+          <div className="wrap">
+            <div className="narrow">
+              <p className="label">{t.attackLabel}</p>
+              <h2 className="big">{t.attackTitle}</h2>
+              <p className="lede">{t.attackBody}</p>
+              <div className="ticket" aria-label={t.poisonedTicket}>
+                <p className="note" style={{ marginBottom: 14, letterSpacing: "0.08em", textTransform: "uppercase" }}>{t.incomingTicket}</p>
+                <p>
+                  {ticketSafe}
+                  {ticketInjected && <span className="inj">{ticketInjected}</span>}
+                </p>
               </div>
-              <p className="lede">
-                {t.heroLede}
-              </p>
             </div>
-            <pre className="ticket" aria-label={t.poisonedTicket}>{attack.ticket}</pre>
             <AttackSplit attack={attack} t={t} />
             {LIVE && (
-              <p style={{ marginTop: "var(--space-md)" }}>
+              <p style={{ marginTop: 24 }}>
                 <button className="btn primary" onClick={runAttack} disabled={running} data-state={running ? "loading" : undefined}>
                   {running ? t.running : t.runAgain}
                 </button>
@@ -220,36 +247,23 @@ export function Dashboard({ lang }: { lang: Lang }) {
           </div>
         </section>
 
-        <section id="map">
+        <section id="pattern">
           <div className="wrap">
-            <div className="map-bar">
-              <div className="head" style={{ marginBottom: 0 }}>
-                <span className="label">{t.mapLabel}</span>
-                <h2>{t.mapTitle}</h2>
-              </div>
-              <div className="seg" role="group" aria-label={t.policyView}>
-                <button aria-pressed={!after} onClick={() => setAfter(false)}>{t.before}</button>
-                <button aria-pressed={after} onClick={() => setAfter(true)}>{t.afterPolicy}</button>
-              </div>
+            <div className="narrow">
+              <p className="label">{t.patternLabel}</p>
+              <h2 className="big">{t.patternTitleA}<br />{t.patternTitleB}</h2>
+              <p className="lede">{t.patternBody(legitSessions)}</p>
             </div>
-            <ToolGraph catalog={catalog} policy={policy} verify={verify} after={after} cutAt={cutAt} />
-            <div className="legend">
-              <span><span className="leg" data-on="true">U</span> {t.legU}</span>
-              <span><span className="leg" data-on="true">S</span> {t.legS}</span>
-              <span><span className="leg" data-on="true">X</span> {t.legX}</span>
-              <span>{t.pathExecuted} {String(verify.reachability_before.allowed)}, {t.afterEq} {String(verify.reachability_after?.allowed)}</span>
-            </div>
-          </div>
-        </section>
-
-        <section id="rules">
-          <div className="wrap">
-            <div className="head">
-              <span className="label">{t.rulesLabel(invariants[0]?.support ?? 0)}</span>
-              <h2>{t.rulesTitle}</h2>
-              <p>
-                {t.rulesBody}
+            <ArcPairs t={t} />
+            {mailRule && (
+              <p className="mono-line narrow mined">
+                {t.minedRule} <span className="hl-y">{mailRule.tool}.{mailRule.arg} == {mailRule.ctx_path}</span>
               </p>
+            )}
+            <div id="rules" className="head" style={{ marginBottom: 24 }}>
+              <p className="label plain">{t.rulesLabel(invariants[0]?.support ?? 0)}</p>
+              <h3>{t.rulesTitle}</h3>
+              <p>{t.rulesBody}</p>
             </div>
             <div className="table-wrap">
               <table>
@@ -282,10 +296,46 @@ export function Dashboard({ lang }: { lang: Lang }) {
           </div>
         </section>
 
+        <section id="proof" className="proof">
+          <div className="wrap">
+            <p className="label plain">{t.proofLabel}</p>
+            <p className="zero">{leakPct}<span>%</span></p>
+            <p className="lede">{t.proofBody(HELDOUT_CUSTOMERS, verify.abuse.n, verify.heldout.n)}</p>
+            <div className="facts">
+              <div className="fact"><strong>{verify.heldout.pass}<small>/{verify.heldout.n}</small></strong><span>{t.legitPass}</span></div>
+              <div className="fact"><strong>{verify.abuse.blocked}<small>/{verify.abuse.n}</small></strong><span>{t.attacksBlocked}</span></div>
+              <div className="fact"><strong>{verify.false_deny.count}</strong><span>{t.falseDenies}</span></div>
+              <div className="fact"><strong>{policy.solver.status}</strong><span>{t.factSolver(policy.solver.broken_tasks.length)}</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="map">
+          <div className="wrap">
+            <div className="map-bar">
+              <div className="head" style={{ marginBottom: 0 }}>
+                <p className="label">{t.mapLabel}</p>
+                <h2>{t.mapTitle}</h2>
+              </div>
+              <div className="seg" role="group" aria-label={t.policyView}>
+                <button type="button" aria-pressed={!after} onClick={() => setAfter(false)}>{t.before}</button>
+                <button type="button" aria-pressed={after} onClick={() => setAfter(true)}>{t.afterPolicy}</button>
+              </div>
+            </div>
+            <ToolGraph catalog={catalog} policy={policy} verify={verify} after={after} cutAt={cutAt} />
+            <div className="legend">
+              <span><span className="leg" data-on="true">U</span> {t.legU}</span>
+              <span><span className="leg" data-on="true">S</span> {t.legS}</span>
+              <span><span className="leg" data-on="true">X</span> {t.legX}</span>
+              <span>{t.pathExecuted} {String(verify.reachability_before.allowed)}, {t.afterEq} {String(verify.reachability_after?.allowed)}</span>
+            </div>
+          </div>
+        </section>
+
         <section id="solver">
           <div className="wrap">
             <div className="head">
-              <span className="label">OR-Tools CP-SAT · Rule of Two</span>
+              <p className="label">OR-Tools CP-SAT · Rule of Two</p>
               <h2>{t.solverTitle(policy.solver.broken_tasks.length, policy.conflicts.length)}</h2>
             </div>
             <div className="facts">
@@ -339,7 +389,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
         <section id="verify">
           <div className="wrap">
             <div className="head">
-              <span className="label">{t.verifyLabel} · {verify.labels.heldout}</span>
+              <p className="label">{t.verifyLabel} · {verify.labels.heldout}</p>
               <h2>{t.verifyTitle}</h2>
             </div>
             <div className="facts">
@@ -361,7 +411,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
                 ))}
               </div>
               <div>
-                <h3 style={{ marginBottom: "var(--space-sm)" }}>{t.residual}</h3>
+                <h3 style={{ marginBottom: "12px" }}>{t.residual}</h3>
                 <ul className="steps">
                   {verify.residual.map((r) => (
                     <li key={`${r.sink}.${r.arg}`}>
@@ -378,7 +428,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
         <section id="ledger" className="band">
           <div className="wrap">
             <div className="head">
-              <span className="label">{LIVE ? t.ledgerLive : t.ledgerReplay} · sha256(prev + canonical_json(entry))</span>
+              <p className="label">{LIVE ? t.ledgerLive : t.ledgerReplay} · sha256(prev + canonical_json(entry))</p>
               <h2>{t.ledgerTitle}</h2>
             </div>
             <div className="chain-state">
@@ -405,16 +455,36 @@ export function Dashboard({ lang }: { lang: Lang }) {
         <section id="results">
           <div className="wrap">
             <div className="head">
-              <span className="label">{t.resultsLabel}</span>
-              <h2>{t.resultsTitle}</h2>
-              <p>{t.resultsBody}</p>
+              <p className="label">{t.benchLabel}</p>
+              <h2>{t.benchTitle}</h2>
+              <p>{t.benchBody}</p>
             </div>
+            <div className="bench">
+              {bench.heldout_full.filter((r) => r.attack_success).sort((x, y) => Number(oursRow(x.name)) - Number(oursRow(y.name))).map((r) => {
+                const p = (100 * r.attack_success!.count) / r.attack_success!.n;
+                const name = t.benchName(r.name);
+                const value = `${p.toFixed(1)}%`;
+                return (
+                  <div className="bench-row" key={r.name} data-ours={oursRow(r.name)} role="img" aria-label={t.benchAria(name, value)}>
+                    <span className="bench-name" aria-hidden="true">{name}</span>
+                    <Blocks pct={p} />
+                    <span className="bench-value" aria-hidden="true">{value}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="note" style={{ margin: "40px 0 0" }}>
+              {t.benchFoot(bench.heldout_full[0]?.attack_success?.n ?? verify.abuse.n, bench.heldout_full[0]?.utility?.n ?? verify.heldout.n)}
+            </p>
+            <p className="label plain" style={{ marginTop: 72 }}>{t.resultsLabel}</p>
+            <h3 style={{ marginBottom: 12 }}>{t.resultsTitle}</h3>
+            <p className="lede" style={{ margin: "0 0 24px" }}>{t.resultsBody}</p>
             <ResultsTable rows={bench.heldout_full} t={t} />
-            <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.llmSample}</h3>
+            <h3 className="sub-title">{t.llmSample}</h3>
             <ResultsTable rows={bench.llm_sample} t={t} />
             {data.liveSummary && (
               <>
-                <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.liveTitle}</h3>
+                <h3 className="sub-title">{t.liveTitle}</h3>
                 <div className="table-wrap">
                   <table>
                     <thead>
@@ -432,10 +502,10 @@ export function Dashboard({ lang }: { lang: Lang }) {
                     </tbody>
                   </table>
                 </div>
-                <p className="note" style={{ marginTop: "var(--space-sm)" }}>{t.liveNote}</p>
+                <p className="note" style={{ marginTop: "12px" }}>{t.liveNote}</p>
               </>
             )}
-            <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.agentdojoTitle}</h3>
+            <h3 className="sub-title">{t.agentdojoTitle}</h3>
             <div className="table-wrap">
               <table>
                 <thead>
@@ -454,10 +524,10 @@ export function Dashboard({ lang }: { lang: Lang }) {
                 </tbody>
               </table>
             </div>
-            <p className="note" style={{ marginTop: "var(--space-sm)" }}>
+            <p className="note" style={{ marginTop: "12px" }}>
               {t.agentdojoNote}
             </p>
-            <p className="note" style={{ marginTop: "var(--space-md)" }}>
+            <p className="note" style={{ marginTop: "16px" }}>
               {t.limits}
             </p>
           </div>
@@ -466,7 +536,7 @@ export function Dashboard({ lang }: { lang: Lang }) {
         <section id="exports">
           <div className="wrap">
             <div className="head">
-              <span className="label">{t.exportsLabel}</span>
+              <p className="label">{t.exportsLabel}</p>
               <h2>{t.exportsTitle}</h2>
             </div>
             <div className="tabs" role="tablist">

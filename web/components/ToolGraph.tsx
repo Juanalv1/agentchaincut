@@ -88,9 +88,9 @@ export function ToolGraph({ catalog, policy, verify, after, cutAt }: {
           label: cut ? "cut" : undefined,
           markerEnd: { type: MarkerType.ArrowClosed },
           style: onPath
-            ? { stroke: after ? "var(--color-muted)" : "var(--color-danger)", strokeWidth: 2.5,
+            ? { stroke: after ? "#737373" : "#E53AA3", strokeWidth: 2.5,
                 strokeDasharray: after ? "6 6" : undefined }
-            : { stroke: "var(--color-rule-strong)", strokeWidth: 1 },
+            : { stroke: "#404040", strokeWidth: 1 },
         });
       }
     }
@@ -103,6 +103,7 @@ export function ToolGraph({ catalog, policy, verify, after, cutAt }: {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        colorMode="dark"
         fitView
         fitViewOptions={{ padding: 0.15 }}
         nodesDraggable={false}
@@ -110,7 +111,7 @@ export function ToolGraph({ catalog, policy, verify, after, cutAt }: {
         proOptions={{ hideAttribution: true }}
         minZoom={0.4}
       >
-        <Background gap={24} color="var(--color-rule)" />
+        <Background gap={24} bgColor="#000" color="#1F1F1F" />
       </ReactFlow>
     </div>
   );
