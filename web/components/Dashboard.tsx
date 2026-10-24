@@ -412,6 +412,29 @@ export function Dashboard({ lang }: { lang: Lang }) {
             <ResultsTable rows={bench.heldout_full} t={t} />
             <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.llmSample}</h3>
             <ResultsTable rows={bench.llm_sample} t={t} />
+            {data.liveSummary && (
+              <>
+                <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.liveTitle}</h3>
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr><th>{t.thModelAttack}</th><th>{t.thLiveUnprotected}</th><th>{t.thLiveProtected}</th><th>{t.thLiveReplied}</th></tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(data.liveSummary.models).sort().map(([key, s]) => (
+                        <tr key={key} data-ours={s.unprotected.leaked > 0}>
+                          <td><code>{key.includes(":") ? key.replace(":", " · ") : `${key} · obvious`}</code></td>
+                          <td className="num">{s.unprotected.leaked}/{s.unprotected.n}</td>
+                          <td className="num">{s.protected.leaked}/{s.protected.n}</td>
+                          <td className="num">{s.protected.replied_to_customer ?? "—"}/{s.protected.n}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="note" style={{ marginTop: "var(--space-sm)" }}>{t.liveNote}</p>
+              </>
+            )}
             <h3 style={{ margin: "var(--space-xl) 0 var(--space-sm)" }}>{t.agentdojoTitle}</h3>
             <div className="table-wrap">
               <table>

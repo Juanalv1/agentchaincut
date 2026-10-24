@@ -12,7 +12,12 @@ from pathlib import Path
 
 MODEL = "claude-opus-5-5"
 ROOT = Path(__file__).resolve().parents[1]
-PRICE_PER_MTOK = {"input": 4.0, "output": 20.0}  # claude-opus-5-5, USD
+PRICES = {  # USD per million tokens (input, output)
+    "claude-opus-5-5": (4.0, 20.0),
+    "claude-sonnet-5-5": (2.0, 10.0),
+    "claude-haiku-5-5": (0.10, 0.50),
+    "claude-haiku-4-5": (1.0, 5.0),
+}
 USAGE_FILE = ROOT / "eval" / "results" / "llm_usage.json"
 
 
@@ -31,13 +36,21 @@ def record_usage(response) -> None:
     usage = getattr(response, "usage", None)
     if usage is None:
         return
-    data = json.loads(USAGE_FILE.read_text(encoding="utf-8")) if USAGE_FILE.exists() else {
-        "model": MODEL, "calls": 0, "input_tokens": 0, "output_tokens": 0, "usd": 0.0}
-    data["calls"] += 1
-    data["input_tokens"] += usage.input_tokens or 0
-    data["output_tokens"] += usage.output_tokens or 0
-    data["usd"] = round(data["input_tokens"] / 1e6 * PRICE_PER_MTOK["input"]
-                        + data["output_tokens"] / 1e6 * PRICE_PER_MTOK["output"], 4)
+    data = json.loads(USAGE_FILE.read_text(encoding="utf-8")) if USAGE_FILE.exists() else {}
+    if "by_model" not in data:  # migrate the single-model format
+        legacy = {k: data.get(k, 0) for k in ("calls", "input_tokens", "output_tokens")}
+        data = {"by_model": {data.get("model", MODEL): legacy} if legacy["calls"] else {}}
+    model = getattr(response, "model", None) or MODEL
+    row = data["by_model"].setdefault(model, {"calls": 0, "input_tokens": 0, "output_tokens": 0})
+    row["calls"] += 1
+    row["input_tokens"] += usage.input_tokens or 0
+    row["output_tokens"] += usage.output_tokens or 0
+    total = 0.0
+    for name, r in data["by_model"].items():
+        price_in, price_out = PRICES.get(name, PRICES[MODEL])
+        r["usd"] = round(r["input_tokens"] / 1e6 * price_in + r["output_tokens"] / 1e6 * price_out, 4)
+        total += r["usd"]
+    data["usd"] = round(total, 4)
     USAGE_FILE.parent.mkdir(parents=True, exist_ok=True)
     USAGE_FILE.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 

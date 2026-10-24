@@ -29,7 +29,8 @@ export async function loadSnapshot(): Promise<Snapshot> {
     json<Snapshot["progent"]>(`${base}/progent.json`),
     json<Snapshot["agentdojo"]>(`${base}/agentdojo.json`),
   ]);
-  return { catalog, invariants, policy, verify, details, bench, live, hook, assay, progent, agentdojo };
+  const liveSummary = await fetch(`${base}/live_summary.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  return { catalog, invariants, policy, verify, details, bench, live, hook, assay, progent, agentdojo, liveSummary };
 }
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
