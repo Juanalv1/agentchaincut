@@ -252,8 +252,8 @@ Integration rule: everyone codes against `contracts/` fixtures from hour 0.
 Route legend: **inline** = parent session; **delegated** = one bounded writer.
 
 - [x] **T01** Repo skeleton + `contracts/` JSON Schemas + fixtures for every artifact — delegated (2+ files)
-- [x] **T02** Mock world: tickets, billing, mail MCP servers (mcp 2.x `MCPServer`) + seed data — inline; branch `feat/t02-world`
-- [ ] **T03** Trace generator (6 legit task types, abuse set, fixed seed, provenance) — delegated
+- [x] **T02** Mock world: tickets, billing, mail MCP servers (mcp 2.x `MCPServer`) + seed data — inline; commit `f3978d5` on `main`
+- [x] **T03** Trace generator (6 legit task types, 8 abuse families, fixed seed, provenance) — inline; on `main`
 - [ ] **T04** Discovery + leg classifier (hints → heuristic → cached LLM → sink default) — delegated
 - [ ] **T05** Invariant miner with filters, reject reasons, suggestion status — delegated
 - [ ] **T06** Reachability prover (before path, scripted calls) — delegated
@@ -300,7 +300,10 @@ outcome exists (miner, optimizer, policy engine, verifier, ledger).
   (estimated score ~7.3, own estimate, not independently reviewed). No code yet.
 - 2026-10-24: T01 done, commit `4b74719` (`feat(contracts): add repo skeleton, JSON schemas and fixtures`), merged to `main`. Review tier: medium (RDD off); writer self-verification plus parent re-run of `pytest` (49 passed). Route: delegated (writer trigger: 2+ non-trivial files). Evidence: `pytest` RED 38 failed / 11 passed against a NotImplementedError stub, then GREEN 49 passed; `pip install -e .[dev]` incl. ortools 9.15 and mcp 2.3 installed on Windows/Python 3.11. Fixture numbers are illustrative, not measured.
 
-- 2026-10-24: T02 done on `feat/t02-world` (stacked branches, one per task; PR/merge left to the team). `world/data.py` seeded backend (200 customers, invoices, tickets, outbox, trusted context with provenance) and `world/servers.py` (tickets/billing/mail on mcp 2.x `MCPServer`; servers built only with the backend service key). Evidence: `tests/test_world.py` RED (ImportError) then GREEN, full suite 60 passed; stdio round trip `python -m world.servers billing` listed tools and read `I-0001`. Packaging now installs `world`, `proxy`, `eval`, `api`; dependency pinned to `mcp>=2.3,<3` because FastMCP was renamed in 2.x. Tool signatures extend the illustrative fixture: `tickets.add_note(author)`, `billing.refund(currency)`.
+- 2026-10-24: T02 done, commit `f3978d5` on `main`. `world/data.py` seeded backend (200 customers, invoices, tickets, outbox, trusted context with provenance) and `world/servers.py` (tickets/billing/mail on mcp 2.x `MCPServer`; servers built only with the backend service key). Evidence: `tests/test_world.py` RED (ImportError) then GREEN, full suite 60 passed; stdio round trip `python -m world.servers billing` listed tools and read `I-0001`. Packaging now installs `world`, `proxy`, `eval`, `api`; dependency pinned to `mcp>=2.3,<3` because FastMCP was renamed in 2.x. Tool signatures extend the illustrative fixture: `tickets.add_note(author)`, `billing.refund(currency)`.
+
+- 2026-10-24: Team decision (user, verbatim): "todo va a main". Work is committed and pushed straight to `main`; no feature branches or PRs. The README "one branch per task" rule no longer applies.
+- 2026-10-24: T03 done. `acc/traces.py`: six legit task types and eight abuse families (`foreign_recipient`, `cross_tenant_recipient`, `foreign_object_id`, `cross_ticket`, `injected_context`, `foreign_refund`, `bulk_exfil`, `excess_refund`); the last call of an abuse trace is the malicious one; `split_customers` gives disjoint training/held-out tenants (120/80). Mutating calls are recorded, not executed. Seeded on purpose so the miner meets every reject reason: `author == agent.id` (constant), `currency == customer.currency` (3 values), `to == ticket.reporter_email` (user provenance), `invoice_id == customer.last_invoice_id` (60% coincidence). Evidence: `tests/test_traces.py` 8 tests, full suite 68 passed. RED was not run separately: the implementation was written before the first test run.
 
 ## Next step
 
