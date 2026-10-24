@@ -109,3 +109,17 @@ def test_call_tool_surfaces_world_errors() -> None:
 
 def test_world_snapshot_is_json_serializable() -> None:
     assert json.dumps(World().snapshot())
+
+
+def test_execute_dispatches_by_qualified_tool_name() -> None:
+    world = World()
+    invoice_id = world.invoice_ids_of("C-003")[0]
+    assert world.execute("billing.invoice_read", {"invoice_id": invoice_id})["customer_id"] == "C-003"
+
+
+def test_execute_rejects_unknown_tools_and_missing_arguments() -> None:
+    world = World()
+    with pytest.raises(WorldError):
+        world.execute("shell.exec", {})
+    with pytest.raises(WorldError):
+        world.execute("mail.send", {"to": "a@b.test"})

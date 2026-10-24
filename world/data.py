@@ -197,6 +197,23 @@ class World:
         self.outbox.append(message)
         return {"queued": True, "id": f"M-{len(self.outbox):05d}"}
 
+    def execute(self, tool: str, args: dict[str, Any]) -> Any:
+        """Run one backend operation by qualified tool name (same surface as the MCP servers)."""
+        handlers = {
+            "tickets.get": lambda a: self.get_ticket(a["ticket_id"]),
+            "tickets.add_note": lambda a: self.add_note(a["ticket_id"], a["body"], a.get("author", AGENT_ID)),
+            "billing.invoice_read": lambda a: self.invoice_read(a["invoice_id"]),
+            "billing.invoice_list_all": lambda a: {"invoices": self.invoice_list_all(a.get("status", "any"))},
+            "billing.refund": lambda a: self.refund(a["invoice_id"], a["amount"], a["currency"]),
+            "mail.send": lambda a: self.send_mail(a["to"], a["subject"], a["body"]),
+        }
+        if tool not in handlers:
+            raise WorldError(f"unknown tool {tool!r}")
+        try:
+            return handlers[tool](args)
+        except KeyError as exc:
+            raise WorldError(f"missing argument {exc.args[0]!r} for {tool}") from None
+
     # -- helpers ----------------------------------------------------------------------------
 
     def snapshot(self) -> dict[str, Any]:
