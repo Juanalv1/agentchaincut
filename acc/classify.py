@@ -16,16 +16,21 @@ from typing import Any, Callable
 from acc import llm as claude
 from acc.contracts import canonical_json
 
-READ_VERBS = {"get", "read", "list", "search", "fetch", "find", "lookup", "query", "show", "view"}
+READ_VERBS = {"get", "read", "list", "search", "fetch", "find", "lookup", "query", "show", "view", "check"}
 WRITE_VERBS = {
     "send", "add", "create", "update", "delete", "remove", "refund", "pay", "post", "write",
     "set", "close", "transfer", "upload", "publish", "reply", "forward", "charge", "cancel",
+    "reschedule", "append", "share", "schedule", "reserve", "invite", "book",
 }
 SENSITIVE_WORDS = {
     "invoice", "billing", "payment", "customer", "account", "card", "salary", "ssn", "medical",
-    "password", "secret", "token", "bank", "iban", "balance", "transaction", "payroll",
+    "password", "secret", "token", "bank", "iban", "balance", "transaction", "transactions", "payroll",
+    "user", "contact", "contacts", "inbox", "emails", "files", "file", "calendar",
 }
-UNTRUSTED_WORDS = {"ticket", "tickets", "message", "inbox", "web", "page", "comment", "issue", "review", "feedback"}
+UNTRUSTED_WORDS = {
+    "ticket", "tickets", "message", "messages", "inbox", "web", "page", "webpage", "comment", "issue",
+    "review", "reviews", "feedback", "email", "emails", "file", "files", "transactions", "channel",
+}
 
 LLM_MODEL = claude.MODEL
 _LEGS_SINK = {"U": False, "S": False, "X": True}
