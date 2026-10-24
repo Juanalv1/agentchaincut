@@ -1,10 +1,10 @@
 {
   "by_model": {
     "claude-opus-5-5": {
-      "calls": 117,
-      "input_tokens": 476519,
-      "output_tokens": 17325,
-      "usd": 2.2526
+      "calls": 141,
+      "input_tokens": 519496,
+      "output_tokens": 23130,
+      "usd": 2.5406
     },
     "claude-haiku-5-5": {
       "calls": 408,
@@ -19,11 +19,11 @@
       "usd": 3.8572
     },
     "claude-sonnet-5-5": {
-      "calls": 54,
-      "input_tokens": 89951,
-      "output_tokens": 8756,
-      "usd": 0.2675
+      "calls": 125,
+      "input_tokens": 213807,
+      "output_tokens": 22870,
+      "usd": 0.6563
     }
   },
-  "usd": 6.5047
+  "usd": 7.1815
 }
