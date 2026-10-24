@@ -56,7 +56,6 @@ def test_policy_passes_heldout_and_blocks_every_abuse_family() -> None:
     assert report["labels"]["live"] == "not-measured"
 
 
-
 def test_permissive_policy_blocks_nothing() -> None:
     _, catalog, _, variants = _setup()
     report, _ = verify(permissive_policy(catalog), catalog, variants)
